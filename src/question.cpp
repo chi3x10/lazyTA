@@ -326,7 +326,9 @@ bool Question::AddIII(string iii) {
 
   m_TotalIW += iii.length();
 
-  if ((int)(iii.length()) > m_MaxIW) m_MaxIW = iii.length();
+  if (iii.length() > m_MaxIW) {
+    m_MaxIW = iii.length();
+  }
 
   return true;
 }
@@ -336,7 +338,9 @@ bool Question::AddAChoice(string c, bool sol) {
     m_NOA = true;
 
     // None of the above is the correct one
-    if (sol) m_SolIndex = m_MaxChoices - 1;
+    if (sol) {
+      m_SolIndex = m_MaxChoices - 1;
+    }
     if (m_MaxCW < 16) m_MaxCW = 16;
 
     m_TotalCW += 16;
@@ -398,128 +402,3 @@ Question::Question() {
     m_Orders[i] = i;
   }
 }
-//------------------------------------------------
-/*void Question::PrintQuestion()
-{
-    cout << "\\item " << m_Question <<"\\\\" << endl;
-
-    int nc, nr, i;
-    // print III
-    if(m_NumOfIII>0)
-    {
-        // how many columns does the table should have?
-        if(m_MaxIW < 27)
-        {   nc = 3;
-            cout << "    \\begin{tabular}{l l l}" << endl;
-        }
-        else if(m_MaxIW < 40)   {
-            nc = 2;
-            cout << "    \\begin{tabular}{l l}" << endl;
-        }
-        else
-        {   nc = 1;
-            cout << "    \\begin{tabular}{p{6in}}" << endl;
-        }
-
-        // number of rows of this table.
-        nr = (int) ceil((double)m_NumOfIII/(double)nc);
-
-        //cout << "maxiw = " << m_MaxIW << endl;;
-        for(int j=0;j<nr;j++)
-        {
-            for(int c=0;c<nc;c++)
-            {
-                 i = j*nc +c;
-                 if(i<m_NumOfIII)
-                    cout << "        \\textbf{"<< m_RN[i] << "} " << m_III[i];
-                //cout << "c=" <<c<< ", i="<< i<<endl;
-                 if(c == nc-1)
-                    cout << "\\\\" << endl;
-                 else
-                    cout << "&" << endl;
-
-            }
-
-        }
-        cout << "    \\end{tabular}\\\\\n";
-    }
-
-    //
-    if(m_NumOfChoices <4)
-    {
-        cout << "ERROR! There are less than 4 choices for this question \n" <<
-m_Question << endl;
-    }
-
-    // how many columns does the table should have?
-    if(m_MaxCW < 27)
-    {   nc = 3;
-        cout << "    \\begin{tabular}{l l l}" << endl;
-    }
-    else if(m_MaxCW < 40)   {
-        nc = 2;
-        cout << "    \\begin{tabular}{l l}" << endl;
-    }
-    else
-    {   nc = 1;
-        cout << "    \\begin{tabular}{p{6in}}" << endl;
-    }
-
-    int noc = (m_NOA)?m_NumOfChoices+1:m_NumOfChoices;
-    nr = (int) ceil((double)noc/(double)nc);
-
-    char a;
-  //  cout << "NOC = " << noc<< "nc=" << nc << ", nr=" << nr <<endl << endl;
-    if(noc < m_MaxChoices)
-    {
-        cout << "ERROR! There are less than 5 choices for this question: \n" <<
-m_Question << endl;
-    }
-    //cout << "maxiw = " << m_MaxIW << endl;;
-    for(int j=0;j<nr;j++)
-    {
-        for(int c=0;c<nc;c++)
-        {
-            i = j*nc +c;
-            a = (char)(65+i);
-
-
-            //cout << "i= " << i << ", ans = " << m_Choices[m_Orders[i]]<<endl;
-            if(i<noc)
-            {
-                if(i == noc -1 && m_NOA)
-                {
-//                    cout << "HAHA: " << noc  << endl;
-                    if(m_TAMode && m_SolIndex == m_Orders[i])
-                        cout << "        \\textsf{\\textbf{("<< a  << ")}
-\\fbox{None of the above.} }";
-                    else
-                        cout << "        \\textsf{\\textbf{("<< a  << ")} None
-of the above. }";
-                }
-                else
-                {
-                    if(m_TAMode && m_SolIndex == m_Orders[i])
-                        cout << "        \\textsf{\\textbf{("<< a  << ")}
-\\fbox{" << m_Choices[m_Orders[i]]<< "}}";
-                    else
-                        cout << "        \\textsf{\\textbf{("<< a  << ")} " <<
-m_Choices[m_Orders[i]]<< "}";
-                }
-            }
-            //cout << "c=" <<c<< ", i="<< i<<endl;
-             if(c == nc-1)
-                cout << "\\\\" << endl;
-             else
-                cout << "&" << endl;
-
-        }
-
-    }
-    cout << "    \\end{tabular}\\\\\n";
-
-
-    // Check max choice length here
-    //
-    //
-}*/
