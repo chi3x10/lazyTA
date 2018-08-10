@@ -8,7 +8,7 @@ string Section::GetSolution() {
   string sol = "";
   for (unsigned int i = 0; i < m_Groups.size(); i++) {
     gp = m_Groups[m_Orders[i]];
-    for (int j = 0; j < gp->GetNoQ(); j++) {
+    for (size_t j = 0; j < gp->GetNoQ(); j++) {
       sol += string(Int2String((gp->GetOrderedQuestion(j))->GetSolution()));
       if ((gp->GetOrderedQuestion(j))->GetSolution() == -1)
         cout << "Warning:   The following question does not have a key "
@@ -56,10 +56,10 @@ void Section::Shuffle() {
   // question
   Group *group;
   Question *ques;
-  for (unsigned int i = 0; i < m_Groups.size(); i++) {
+  for (size_t i = 0; i < m_Groups.size(); i++) {
     group = m_Groups[i];
     group->Shuffle();
-    for (int j = 0; j < group->GetNoQ(); j++) {
+    for (size_t j = 0; j < group->GetNoQ(); j++) {
       // shffle choices.
       ques = group->GetQuestion(j);
       ques->Shuffle();
@@ -74,7 +74,9 @@ void Section::Shuffle() {
 }*/
 //-----------------------------------------------------------------------------
 Section::Section() {
-  for (int i = 0; i < 100; i++) m_Orders[i] = i;
+  for (size_t i = 0; i < 100; i++) {
+    m_Orders[i] = i;
+  }
 }
 Section::~Section() {
   Group *gp;
@@ -84,11 +86,3 @@ Section::~Section() {
   }
   m_Groups.clear();
 }
-//-----------------------------------------------------------------------------
-// Question* Group::GetQuestion(int i)
-//{
-//    if(i>= m_Questions.size())
-//        return NULL;
-
-//  return m_Questions[m_Orders[i]];
-//}
