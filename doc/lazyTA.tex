@@ -1,0 +1,250 @@
+\documentclass[11pt,letterpaper]{article}
+\special{papersize=8.5in,11in}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\setlength{\parindent}{0in}
+\setlength{\headsep}{8pt}
+\setlength{\footskip}{5pt}
+\parskip 0pt 
+
+
+
+%opening
+\title{LAZY TA}
+\author{Jason Yu-Tseh Chi}
+
+
+
+\begin{document}
+%The exam will be inserted here. 
+
+\section{Introduction}
+LAZYTA is a software that 
+
+\begin{itemize}\itemsep0pt
+\item randomly choose questions from repositories of multiple choice questions. 
+\item shuffles the order of the questions. 
+\item shuffles the options of a question. 
+\item generates multiple forms of the selected questions in latex format and answer keys to the forms. 
+\item allows users to specify group questions. Group questions will remain together after the shuffling. 
+\item allows users to specify questions that must be included. 
+\end{itemize}
+
+\section{Repository}
+
+\subsection{A simple example}
+Below is a sample exam repository. Just like html files, the basic structure of a repository file consists of tags. The $<$q$>$ and $<$/q$>$ tags define a question. Inside these two tags, the $<$b$>$ and $<$/b$>$ tags define the stem of this question. Each option of the question is enclosed by $<$c$>$ and $<$/c$>$ tags. The $<$b$>$ and $<$/b$>$ tags must always be placed before the $<$c$>$ and $<$/c$>$ tags. 
+
+\begin{verbatim}
+<q> 
+<b>This is sample question one.</b>
+<c> Choice 1.</c>
+<c> Choice 2.</c>
+<c> Choice 3.</c>
+<c> Choice 4.</c>
+<c> Choice 5.</c>
+<!-- Comment -->
+</q>
+\end{verbatim}
+
+The above question code will generate LaTex codes that can be "typeset-ed" into the following. Notice the order of the options is shuffled.
+
+\begin{enumerate}[1.\underline{\makebox[0.5in]{    }}]
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+\item This is sample question one.\\
+    \begin{tabular}{l l l l l}
+        \textsf{\textbf{(A)} Choice 1.}&
+        \textsf{\textbf{(B)} Choice 3.}&
+        \textsf{\textbf{(C)} Choice 2.}&
+        \textsf{\textbf{(D)} Choice 5.}&
+        \textsf{\textbf{(E)} Choice 4.}\\
+    \end{tabular}\\
+\end{enumerate}
+
+\subsection{Question Properties}
+
+\begin{description}
+    \item[$<$ANS$>$] This property tag tells the program which option is the correct one. This is primarily used to generate the answer key files. When a question doesn't have an $<$ANS$>$ tag, a question mark will be placed in the answer key file. Also, in the TA form\footnote{Discussed in later section}, the correct answer will be marked with a box. This tag must be placed in between the $<$c$>$ and $<$/c$>$ tags. 
+
+    \item[$<$NOA$>$] This tag creates a option "None of the above.". This option will always be the last option. This tag must be placed in between the $<$c$>$ and $<$/c$>$ tags. 
+
+    \item[$<$noshuffle$>$] This tag disables the shuffling of options of a question. It must be placed between the $<$q$>$ and $<$/q$>$ tags and before the $<$b$>$ tag of the question. 
+
+    \item[$<$layout=n$>$] Force the layout format. n is either 1,2,3, or 4. Without this property tag, the program automatically determinate layout style of a question based on the length of the longest option(\# of characters). This option allows users to set the layout of the question. Figure below demonstrates four different layout styles. 
+
+
+\hspace{-0.65in}\rule{7in}{0.02in}
+\begin{enumerate}[1.\underline{\makebox[0.5in]{    }}]
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+
+%%Warning!!: There should not be any text between the \begin{enumerate.....
+%%and the first \item{... 
+%% You can copy the text or the \includegraphic lines above the \begin{enumerate}.... line
+%% to prevent LaTEX compile error!! 
+
+
+%% ----------------------------------------------------
+\item An example of layout 1.\\
+    \begin{tabular}{l l l l l}
+        \textsf{\textbf{(A)} Option 2.}&
+        \textsf{\textbf{(B)} Option 5.}&
+        \textsf{\textbf{(C)} Option 4.}&
+        \textsf{\textbf{(D)} Option 1.}&
+        \textsf{\textbf{(E)} Option 3.}\\
+    \end{tabular}\\
+%% ----------------------------------------------------
+\item An example of layout 2.\\
+    \begin{tabular}{l l l}
+        \textsf{\textbf{(A)} Option 5.}&
+        \textsf{\textbf{(B)} Option 3.}&
+        \textsf{\textbf{(C)} Option 1.}\\
+        \textsf{\textbf{(D)} Option 2.}&
+        \textsf{\textbf{(E)} Option 4.}&
+\\
+    \end{tabular}\\
+%% ----------------------------------------------------
+\item An example of layout 3.\\
+    \begin{tabular}{l l}
+        \textsf{\textbf{(A)} Option 5.}&
+        \textsf{\textbf{(B)} Option 4.}\\
+        \textsf{\textbf{(C)} Option 2.}&
+        \textsf{\textbf{(D)} Option 1.}\\
+        \textsf{\textbf{(E)} Option 3.}&
+\\
+    \end{tabular}\\
+%% ----------------------------------------------------
+\item An example of layout 4.\\
+    \begin{tabular}{p{6in}}
+        \textsf{\textbf{(A)} Option 2.}\\
+        \textsf{\textbf{(B)} Option 4.}\\
+        \textsf{\textbf{(C)} Option 1.}\\
+        \textsf{\textbf{(D)} Option 3.}\\
+        \textsf{\textbf{(E)} Option 5.}\\
+    \end{tabular}\\
+
+\hspace{-1in} \rule{7in}{0.02in}
+%%===========================================================
+\end{enumerate}
+
+    \item[$<$keepme$>$] The question that contains this tag is guaranteed to be selected. It must be placed between the $<$q$>$ and $<$/q$>$ tags and before the $<$b$>$ tag of the question. 
+\end{description}
+
+Now, let's take a look at a more complicated example. 
+\begin{verbatim}
+<q><keepme><layout=4>
+<b>Which state is nicknamed sunshine state?</b>
+<c> New York.</c>
+<c> Florida.<ANS></c>
+<c> <NOA> </c> <!-- None of the above tag -->
+<c> Alaska. </c>
+<c> Texas.</c>
+</q>
+\end{verbatim}
+
+The latex code generated from the above repository is typeseted into 
+\begin{enumerate}[1.\underline{\makebox[0.5in]{    }}]
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+\item Which state is nicknamed the sunshine state?\\
+    \begin{tabular}{l l l l l}
+        \textsf{\textbf{(A)} Texas.}&
+        \textsf{\textbf{(B)} Alaska.}&
+        \textsf{\textbf{(C)} Florida.}&
+        \textsf{\textbf{(D)} New York.}&
+        \textsf{\textbf{(E)} None of the above. }\\
+    \end{tabular}\\
+\end{enumerate}
+
+\subsection{Group}
+Group tag ($<$group$>$ and $<$/group$>$) are used when multiple questions must be placed together. Questions enlosed by $<$group$>$ and $<$/group$>$ can still be shuffled but only shuffled within the group. Below is an example of using group tags. 
+
+\begin{verbatim}
+<group><noshuffle>
+
+<q><keepme><layout=4>
+<b>Which state is nicknamed the sunshine state?</b>
+<c> New York.</c>
+<c> Florida.<ANS></c>
+<c> <NOA> </c> <!-- None of the above tag -->
+<c> Alaska. </c>
+<c> Teax.</c>    </q>
+
+<q> <b>Continue from previous question. What is the best university of the sunshine state?</b>
+<c><NOA></c>
+<c>University of Florida. <ANS></c>
+<c>NYU.</c>
+<c>Teax A\&M. </c>
+<c>Collage of survial training. </c> </q>
+
+</group>
+\end{verbatim}
+In the above example, it is very obvious that the 2nd question depends on the first one. Therefore it's not appropriate to shuffle the questions within group. The $<$noshuffle$>$ tag right after the $<$group$>$ tag tells the program not to shuffle the questions within this group. Note: the options of each question will still be shuffled unless a $<$noshuffle$>$ tag is inserted inside the question(between $<$q$>$ and $<$/q$>$  ). 
+\subsection{Special tags}
+\begin{description}
+    \item[Comments] Just like html, comments must be placed in between '$<$!{-}{-}' and '{-} {-}$>$'. You can find examples of comments in the group questions example above. 
+
+    \item[$<$img$>$ $<$/img$>$] This allows users to insert images in the exams. You must put the latex code that actually inserts the image. Here is an example: 
+\begin{verbatim}
+<group>
+    <img>\includegraphics[bb=0 0 345 423, width=1.4in]{imgs/exam3_fig1.jpg}</img>
+    <q><b>What is the latin name of the animal in the picture above?</b>
+        <c>Option1</c><c>Option2</c><c>Option3</c><c>Option4</c><c><NOA></c>
+    </q>
+    <q><b>How would you eat it if it's actually legal to eat it?</b>
+        <c>Option1</c><c>Option2</c><c>Option3</c><c>Option4</c><c><NOA></c>
+    </q>
+</group>
+\end{verbatim}
+An image can be inserted either in a group or a question. When it's inserted in a group, the $<$img$>$ must be placed right after the $<$group$>$ tag. The image will be inserted before the first question of the group. When it's inserted in a question, the $<$img$>$ tag must be placed right after the $<$q$>$ tag. The image will be inserted right before the question.
+
+ 
+\end{description}
+
+\section{Runnig the program}
+Run make to compile the program. A binary file named lazyTA will be generated. To see the help of lazyTA, simply type
+\begin{verbatim}
+    ./lazyTA
+\end{verbatim}
+Here are some examples:
+\begin{enumerate}
+    \item Read repository file exam1.rep. A non-shuffled form (form 0) and a shuffled form (form A) along with their corresponding TA forms will be generated. Since the output filename is not specified, the output filenames will be EXAM\_Form\_XXX.tex
+    \begin{verbatim}
+./lazyTA -i exam1.rep
+    \end{verbatim}
+
+    \item Read only 40 questions from repository file exam1.rep. 
+    \begin{verbatim}
+./lazyTA -i exam1.rep 40
+    \end{verbatim}
+
+    \item Read a total of 50 questions from repository file exam1\_.rep and exam1\_2.rep. 
+    \begin{verbatim}
+./lazyTA -i exam1_1.rep -i exam1_2.rep -nq 50
+    \end{verbatim}Numbers of questions selected from each repository will be determined proportionally based on the total number of questions in each repository. For example, there are 100 questions in exam1\_1.rep and 200 questions in exam1\_2.rep. $\frac{100}{(100+200)} \times 50$ questions will be selected from exam1\_1.rep and $\frac{200}{(100+200)} \times 50$ questions will be selected from exam1\_2.rep. 
+
+    \item Read 10 questions from exam1\_.rep and 25 questions from exam1\_2.rep. 
+    \begin{verbatim}
+./lazyTA -i exam1_1.rep 10 -i exam1_2.rep 25
+    \end{verbatim}
+
+    \item Generate 3 different shuffled forms. The filenames will be EXAM\_Form\_A/B/C...tex.
+    \begin{verbatim}
+./lazyTA -i exam1_1.rep -nf 3
+    \end{verbatim}
+
+    \item Read from exam1.rep and the output filename will be midterm\_Form\_A.tex. 
+    \begin{verbatim}
+./lazyTA -i exam1_1.rep -o midterm
+    \end{verbatim}
+
+\end{enumerate}
+
+
+\end{document}
+
