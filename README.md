@@ -2,7 +2,7 @@
 
 ## Introduction
 
-lazyTA is an app I implemented when I first became TA for an undergraduate class at University of Florida in 2008. It reads multiple choice questions from a repo file and populates properly formatted latex codes. In particular, lazyTA is capable of the following:
+**lazyTA** is an app I implemented when I first became TA for a class at University of Florida in 2008. I found it very tedious and mistake-prone to design multiple forms of exam and their corresponding solutions manually. **lazyTA** reads multiple choice questions from a repo file and populates multiple forms of properly formatted latex codes. In particular, lazyTA is capable of the following:
 
  - randomly chooses questions from repo files. 
  - randomly shuffles the order of the questions. 
@@ -199,4 +199,10 @@ on the total number of questions in each repo.
 ```
 ./lazyTA -i exam1_1.rep -o midterm
 ```
+## Useful Scripts
 
+- `pdf_all_tex_files.sh`: Compile all tex files in a folder to pdfs.
+- `bubble.m`: A matlab script to fill in the solution on a scantron form. Unless you are using the exact same scantron as we did, you will need to modify it. 
+
+## License
+**lazyTA** is released under a [GPLv3 license](https://choosealicense.com/licenses/gpl-3.0/).
