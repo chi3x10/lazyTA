@@ -1,0 +1,71 @@
+<q>
+<b> What is Michael Jackson's first name?</b>
+<c> Jackson</c>
+<c> Jason</c>
+<c> Stinky</c>
+<c> Michael <ANS></c>
+<c> John </c>
+</q>
+
+<q><noshuffle>
+<b> The choices in this question will not be shuffled? (D) is the correct answer.</b>
+<c> <-- Best choice.</c>
+<c> Me. </c>
+<c> I. </c>
+<c> I am the correct answer. <ANS></c>
+<c> Elephant </c>
+</q>
+
+<q>
+<b> What is between 3 and 4?</b>
+<c> 5. </c>
+<c> 1. </c>
+<c> 2. </c>
+<c> 3.5 <ANS></c>
+<c> 10 </c>
+</q>
+
+<q>
+<b> Which of the following states is California?</b>
+<c> Ohio. </c>
+<c> Michigan. </c>
+<c> New Mexico. </c>
+<c> Washington. </c>
+<c> California.<ANS> </c>
+</q>
+
+
+<q><keepme><layout=4>
+<b>Which state is nicknamed sunshine state?</b>
+<c> New York.</c>
+<c> Florida.<ANS></c>
+<c> <NOA> </c> <!-- None of the above tag -->
+<c> Alaska. </c>
+<c> Texas.</c>
+</q>
+
+<group><noshuffle>
+
+<txt>\textbf{YOU CAN INSERT TEXT AS WELL AS IMAGES HERE IN THE BEGINING OF A GROUP OF QUESTIONS. \\}</txt>
+<img>\fbox{\includegraphics[bb=0 0 903 232, width=5in]{imgs/uf.png}}\\\\</img>
+
+<q><keepme><layout=4>
+<b>Which state is nicknamed the sunshine state?</b>
+<c> New York.</c>
+<c> Florida.<ANS></c>
+<c> <NOA> </c> <!-- None of the above tag -->
+<c> Alaska. </c>
+<c> Teax.</c>
+</q>
+
+<q> <b>Continue from previous question. What is the best university of the sunshine state?</b>
+<c><NOA></c>
+<c>University of Florida. <ANS></c>
+<c>NYU.</c>
+<c>Teax A\&M. </c>
+<c>Stanford. </c> 
+</q>
+
+</group>
+
+
