@@ -19,21 +19,22 @@ class Question {
  public:
   Question();
   void SetLabel(const string &);
-  bool SetQuestion(string q);
-  bool AddAChoice(string c, bool sol);
-  bool AddIII(string iii);
+  bool SetQuestion(const string &q);
+  bool AddAChoice(const string &choice, const bool sol);
+
+  bool AddIII(const string &iii);
   //     void AddNoA(){m_NOA = true; m_MaxCW = 16;};
-  void SetMaxChoices(size_t m) { m_MaxChoices = m; }
+  void SetMaxChoices(const size_t m) { m_MaxChoices = m; }
   //        void PrintQuestion(){;};
   void Shuffle();
-  void SetTAMode(bool l) { m_TAMode = l; }
+  void SetTAMode(const bool l) { m_TAMode = l; }
   int GetSolution();
   string GetQuestionBody() { return m_Question; }
   void AddWholeQuestion(string str);
   // set question number
-  void SetQN(int n) { m_QN = n; }
-  void SetLayout(int);
-  void SetAbleShuffle(bool b) { m_AbleShuffle = b; }
+  void SetQN(const int n) { m_QN = n; }
+  void SetLayout(const int);
+  void SetAbleShuffle(const bool b) { m_AbleShuffle = b; }
   friend ostream &operator<<(ostream &out, const Question &q);
 
  private:

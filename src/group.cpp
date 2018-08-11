@@ -13,14 +13,14 @@ Group::~Group() { // cout << "Destructor visited! " << m_Questions.size() <<
   m_Questions.clear();
 }
 
-Question *Group::GetQuestion(size_t i) {
+Question *Group::GetQuestion(const size_t i) {
   if (i >= m_Questions.size()) {
     return nullptr;
   }
   return m_Questions[i];
 }
 
-Question *Group::GetOrderedQuestion(size_t i) {
+Question *Group::GetOrderedQuestion(const size_t i) {
   if (i >= m_Questions.size()) {
     return nullptr;
   }
@@ -68,7 +68,7 @@ void Group::Shuffle() {
   }
 }
 //-----------------------------------------------------------------------------
-void Group::SetTAMode(bool t) {
+void Group::SetTAMode(const bool t) {
   for (unsigned int i = 0; i < m_Questions.size(); i++) {
     m_Questions[i]->SetTAMode(t);
   }
