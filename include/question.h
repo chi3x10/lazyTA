@@ -1,5 +1,6 @@
-#ifndef __INCLUDE_QUESTION_H__
-#define __INCLUDE_QUESTION_H__
+#pragma once
+
+#include "utils.h"
 
 #include <math.h>
 #include <time.h>
@@ -9,16 +10,10 @@
 #include <string>
 #include <vector>
 
+namespace lazyta {
+
 using std::string;
 using namespace std;
-
-string ConvertSol(string sol);
-string Int2String(int v);
-bool Roll(int n, int m);
-bool IsNumber(const std::string &s);
-bool StringContains(string s, string k);
-void TrimSpaces(string &str);
-void ShuffleIndex(size_t *index, size_t num);
 
 class Question {
  public:
@@ -28,7 +23,7 @@ class Question {
   bool AddAChoice(string c, bool sol);
   bool AddIII(string iii);
   //     void AddNoA(){m_NOA = true; m_MaxCW = 16;};
-  void SetMaxChoices(int m) { m_MaxChoices = m; }
+  void SetMaxChoices(size_t m) { m_MaxChoices = m; }
   //        void PrintQuestion(){;};
   void Shuffle();
   void SetTAMode(bool l) { m_TAMode = l; }
@@ -44,10 +39,17 @@ class Question {
  private:
   static constexpr size_t kMaxNumChoices = 20;
   bool m_AbleShuffle;
+
+  size_t m_NumOfChoices;
+
   // question
   string m_Question;
   // I, II, .. .type of question
   string m_III[10];
+
+  // Index of the correct answer
+  int m_SolIndex;
+
   //
   size_t m_NumOfIII;
 
@@ -55,13 +57,6 @@ class Question {
   string m_Label;
   // you can have up to 20 choices.
   string m_Choices[kMaxNumChoices];
-  //
-  size_t m_NumOfChoices;
-  // Index of the correct answer
-  size_t m_SolIndex;
-
-  // question type: 1: regular, 2: I, II, III,...
-  // int m_QType;
 
   // max choice width -- used to determine the layout of choices.
   size_t m_MaxCW;
@@ -78,7 +73,7 @@ class Question {
   size_t m_Orders[10];
 
   // maximum number choices.
-  int m_MaxChoices;
+  size_t m_MaxChoices;
   // Roman numbers
   string m_RN[10];
 
@@ -92,4 +87,4 @@ class Question {
   int m_QN;
 };
 
-#endif  // __INCLUDE_QUESTION_H__
+}  // namespace lazyta

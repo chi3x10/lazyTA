@@ -1,5 +1,4 @@
-#ifndef __INCLUDE_SECTION_H__
-#define __INCLUDE_SECTION_H__
+#pragma once
 
 #include <math.h>
 #include <time.h>
@@ -8,6 +7,8 @@
 #include <string>
 #include <vector>
 #include "group.h"
+
+namespace lazyta {
 
 class Section {
  public:
@@ -38,4 +39,4 @@ class Section {
   size_t m_Orders[kMaxNumSections];
 };
 
-#endif  // __INCLUDE_SECTION_H__
+}  // namespace lazyta

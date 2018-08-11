@@ -1,5 +1,6 @@
 #include "section.h"
 
+namespace lazyta {
 using namespace std;
 using std::string;
 
@@ -9,7 +10,7 @@ string Section::GetSolution() {
   for (unsigned int i = 0; i < m_Groups.size(); i++) {
     gp = m_Groups[m_Orders[i]];
     for (size_t j = 0; j < gp->GetNoQ(); j++) {
-      sol += string(Int2String((gp->GetOrderedQuestion(j))->GetSolution()));
+      sol += string(utils::Int2String((gp->GetOrderedQuestion(j))->GetSolution()));
       if ((gp->GetOrderedQuestion(j))->GetSolution() == -1)
         cout << "Warning:   The following question does not have a key "
                 "provided.\n\t---------------------------------------------"
@@ -29,11 +30,11 @@ void Section::SetTAMode(bool t) {
 //----------------------------------------------------------------------------
 ostream &operator<<(ostream &out, const Section &s) {
   Group *g;
-  out << "\%\%Warning!!: There should not be any text between the "
-         "\\begin{enumerate.....\n\%%and the first \\item{... "
-      << "\n%% You can copy the text or the \\includegraphic lines above the "
-         "\\begin{enumerate}.... line\n"
-      << "%% to prevent LaTEX compile error!! " << endl;
+  out << "%%Warning!!: There should not be any text between the "
+         "\\begin{enumerate.....\n%%and the first \\item{... "
+         "\n%% You can copy the text or the \\includegraphic lines above the "
+         "\\begin{enumerate}.... line\n%% to prevent LaTEX compile error!! " << endl;
+
   // previous group is a multiple questions group
   bool preMG = false;
   for (unsigned int i = 0; i < s.m_Groups.size(); i++) {
@@ -51,7 +52,7 @@ ostream &operator<<(ostream &out, const Section &s) {
 //----------------------------------------------------------------------------
 void Section::Shuffle() {
   // shuffle groups
-  ShuffleIndex(m_Orders, m_Groups.size());
+  utils::ShuffleIndex(m_Orders, m_Groups.size());
   // shuffle questions in each group if the group contains more than one
   // question
   Group *group;
@@ -86,3 +87,4 @@ Section::~Section() {
   }
   m_Groups.clear();
 }
+}  // namespace lazyta

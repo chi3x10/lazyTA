@@ -46,8 +46,8 @@
 
 <group><noshuffle>
 
-<txt>\textbf{YOU CAN INSERT TEXT AS WELL AS IMAGES HERE IN THE BEGINING OF A GROUP OF QUESTIONS. \\}</txt>
-<img>\fbox{\includegraphics[bb=0 0 903 232, width=5in]{imgs/uf.png}}\\\\</img>
+<txt>\textbf{YOU CAN INSERT TEXT AS WELL AS IMAGES HERE IN THE BEGINING OF A GROUP OF QUESTIONS. $e^{i\pi} + 1 =0$\\}</txt>
+<img>%%\fbox{\includegraphics[bb=0 0 903 232, width=5in]{imgs/uf.png}}\\\\</img>
 
 <q><keepme><layout=4>
 <b>Which state is nicknamed the sunshine state?</b>

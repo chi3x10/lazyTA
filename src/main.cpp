@@ -14,20 +14,17 @@ using namespace std;
 using std::string;
 using std::ifstream;
 using std::ofstream;
-
+using namespace lazyta;
 
 int main(int argc, char *argv[]) {
   bool inGroup = false;
-  //
   bool collecting = false;
-  // footprint mode
+  // footprint mode. I don't know why I named it footprint.
   bool fpMode = false;
   // footprint filename
   string fpFilename;
-  // footprint
+  // strings that represent footprint.
   vector<string> fpString;
-  // current section number;
-  // int secNum =0;
   // total number of questions in the repositories
   size_t nQDB = 0;
   // the path to store the image
@@ -38,8 +35,6 @@ int main(int argc, char *argv[]) {
   Group *gp;
   // exam
   vector<Section *> exam;
-  // garbage question;
-  //    vector<Questioni*> loserQ;
 
   string questionLabel = "";
   // number of forms you want to generate. default value = 1;
@@ -119,7 +114,7 @@ int main(int argc, char *argv[]) {
       i++;
       filenames.push_back(string(argv[i]));
       if (i >= argc - 1) break;
-      if (!IsNumber(string(argv[i + 1])) && nQUProvided) {
+      if (!utils::IsNumber(string(argv[i + 1])) && nQUProvided) {
         cout << "ERROR: You need to provide the number of questions you will "
                 "use from this file."
              << endl;
@@ -128,7 +123,7 @@ int main(int argc, char *argv[]) {
         return 1;
       }
       // check if nQU number is provided
-      if (IsNumber(string(argv[i + 1]))) {
+      if (utils::IsNumber(string(argv[i + 1]))) {
         i++;
         nQU.push_back(atoi(argv[i]));
         nQUProvided = true;
@@ -139,10 +134,10 @@ int main(int argc, char *argv[]) {
       cout << "Output filename is set to be: " << ofn << endl;
 
     } else if (string(argv[i]) == "-nf") {
-      nForm = atoi(argv[i + 1]);
+      nForm = static_cast<size_t>(atoi(argv[i + 1]));
       i++;
     } else if (string(argv[i]) == "-nq") {
-      nQExam = atoi(argv[i + 1]);
+      nQExam = static_cast<size_t>(atoi(argv[i + 1]));
       i++;
     } else if (string(argv[i]) == "-fp") {
       fpMode = true;
@@ -174,7 +169,6 @@ int main(int argc, char *argv[]) {
     utils::PrintMan();
     return 1;
   }
-  //-------------------------------------------------------------
   if (!utils::LoadTemplate(templatefn, tContent)) {
     cout << "ERROR: template file\"" << templatefn
          << "\" not found! \nBYE BYE!\n\n";
@@ -210,7 +204,7 @@ int main(int argc, char *argv[]) {
   }
 
   // nuber of questions in each sections;
-  int nq = 0;
+  size_t nq = 0;
   // find out the total number of questions in the repositories.
   // cout << "what??? \n\n";
 
@@ -248,11 +242,13 @@ int main(int argc, char *argv[]) {
         nq++;
       }
       // check repository
-      if (!utils::CheckRep(filenames[i], lineNo, s1, inTag, tags)) return 3;
+      if (!utils::CheckRep(filenames[i], lineNo, s1, inTag, tags)) {
+        return 3;
+      }
     }
 
     // final check
-    for (int jj = 0; jj < 5; jj++) {
+    for (size_t jj = 0; jj < 5; jj++) {
       if (inTag[jj]) {
         cout << "ERROR:\tMissing tag \"</" << tags[jj]
              << ">\" in the end of repository: \"" << filenames[i]
@@ -341,16 +337,9 @@ int main(int argc, char *argv[]) {
       totalnQU += nu;
     }
     nu = 0;
-  }
-  //
-  else
+  } else {
     totalnQU = nQExam;
-  //---------------------------
-  // cout << "totalnQU = " << totalnQU << ", " << endl;
-
-  // cout << "nQS = " << nQS[0] << ", " << nQS[1] << endl;
-  // cout << "nQU = " << nQU[0] << ", " << nQU[1] << endl;
-  // cout << nQExam << endl;
+  }
 
   // not enough question in nQU
   if (totalnQU < nQExam) {
@@ -370,23 +359,21 @@ int main(int argc, char *argv[]) {
         nQU[i] += d1;
         diff -= d1;
       }
-      // cout << i<< ":hello->" << nQS[i] << endl;
     }
   }
 
-  // going through the questions and find the <keepme> tag
-  //
-  if (verbose)
+  if (verbose) {
     cout << "Going through the repositories and look for the <keepme> "
             "tags....\n";
+  }
 
   nKeepme = 0;
   s1 = "";
-  size_t nkm;
+
   // flag the <keepme> questions
   int *pKeep, *pUsed;
   for (unsigned int i = 0; i < filenames.size(); i++) {
-    nkm = 0;
+    size_t nkm = 0;
     nq = 0;
     ifs.open(filenames[i].c_str());
 
@@ -395,8 +382,8 @@ int main(int argc, char *argv[]) {
     // scan through the whole database to see how many questions are there
     while (ifs.good()) {
       getline(ifs, s1);
-      if (StringContains(s1, "<q>")) {
-        if (StringContains(s1, "<keepme>")) {
+      if (utils::StringContains(s1, "<q>")) {
+        if (utils::StringContains(s1, "<keepme>")) {
           pKeep[nq] = 1;
           nKeepme++;
           nkm++;
@@ -416,17 +403,19 @@ int main(int argc, char *argv[]) {
       }  // if
     }    // if
   }
-  if (verbose) cout << endl;
+  if (verbose) {
+    cout << endl;
+  }
 
   // cout << "nQS = " << nQS[0] << ", " << nQS[1] << endl;
   // cout << "nQU = " << nQU[0] << ", " << nQU[1] << endl;
 
-  for (unsigned int i = 0; i < nQS.size(); i++)
+  for (unsigned int i = 0; i < nQS.size(); i++) {
     cout << "(" << nQU[i] << "/" << nQS[i]
          << ") questions are selected from repository - " << filenames[i]
          << endl;
+  }
   cout << endl;
-  // return 0;
 
   if (nKeepme > nQExam) {
     cout << "Warning: Number of questions that are marked <keepme> is greater "
@@ -456,24 +445,16 @@ int main(int argc, char *argv[]) {
       cout << endl;
       fUsed.push_back(fu);
     }
-    // cout << "Okay let;s check it\n";
-    // cout << fUsed.size()<< "fpString: "<<fpString.size()<< endl;
   } else {
     // randomly decide which question to use.
     cout << "Generated footprint code: \n\ti.e. randomly decide which "
             "questions to pick.\n";
-    for (unsigned int v = 0; v < fUsed.size(); v++) {
+    for (size_t v = 0; v < fUsed.size(); v++) {
       pUsed = fUsed[v];
       pKeep = fKeep[v];
 
       // randomly select the questions.
-      ShuffleIndex(index, nQS[v]);
-      // cout << "Doing shuffle here! >>> " << nQS[v] << ", v=" << v <<endl;
-      // for(int i=0;i<nQS[v];i++)
-      //    cout << index[i] << " " ;
-      // cout << "\n";
-      //    cout << "step1 \n\n";
-      // int nm1 =0;
+      utils::ShuffleIndex(index, nQS[v]);
 
       for (size_t i = 0; i < nQU[v]; i++) {
         pUsed[index[i]] = 1;
@@ -497,12 +478,8 @@ int main(int argc, char *argv[]) {
       }
       cout << endl;
     }
-
-  }  // end of not fpMode
-  // for printing footprint mode
+  }
   cout << endl;
-
-  // cout << "nQS = " << nQS[0] << ", " << nQS[1] << endl;
 
   //# of questions added already;
   int qAdded = 1;
@@ -533,14 +510,14 @@ int main(int argc, char *argv[]) {
     while (ifs.good()) {
       getline(ifs, s1);
       // trim leading and tailing spaces.
-      TrimSpaces(s1);
+      utils::TrimSpaces(s1);
 
       // increment line number
       l++;
 
       // the comments
-      if (StringContains(s1, "<!--")) {
-        if (!StringContains(s1, "-->")) {
+      if (utils::StringContains(s1, "<!--")) {
+        if (!utils::StringContains(s1, "-->")) {
           cout << "Warning: At line " << l << ": comments must be enclosed by "
                                               "\"<!--\" and \"-->\" and they "
                                               "must be in the same line. \n";
@@ -560,11 +537,11 @@ int main(int argc, char *argv[]) {
                  << "\" is removed! \n";
           s1.replace(b1, e1 - b1 + 3, "");
           // cout << "after:   " << s1 << endl;
-          TrimSpaces(s1);
+          utils::TrimSpaces(s1);
         }
       }
 
-      if (collecting && StringContains(s1, "<noshuffle>")) {
+      if (collecting && utils::StringContains(s1, "<noshuffle>")) {
         noShuffleChoice = true;
         // remove <noshuffle> from s1
         s1.replace(s1.find("<noshuffle>"), 11, "");
@@ -575,7 +552,7 @@ int main(int argc, char *argv[]) {
       // put the whole question in one string
       if (collecting) {
         // if </q is there>
-        if (StringContains(s1, "</q>")) {
+        if (utils::StringContains(s1, "</q>")) {
           // collecting must be true there
           // must put whatever is infront of this token in wq
           wq += s1.substr(0, s1.find("</q>") + 4);  // keep the </q> in the end
@@ -616,38 +593,32 @@ int main(int argc, char *argv[]) {
             gp->PushBack(q);
             if (verbose) {
               string ddd = q->GetQuestionBody();
-              int n = (ddd.length() < 30) ? ddd.length() : 30;
+              size_t n = (ddd.length() < 30) ? ddd.length() : 30;
               cout << "Question: \n\t" << ddd.substr(0, n)
                    << ".... is added. \n";
             }
           } else {
             if (verbose) {
               string ddd = q->GetQuestionBody();
-              int n = (ddd.length() < 30) ? ddd.length() : 30;
+              size_t n = (ddd.length() < 30) ? ddd.length() : 30;
               cout << "Haha! XD   Question: \n\t" << ddd.substr(0, n)
                    << ".... is not selected. \n";
             }
             delete q;
-            //                        cout << "nq=" << nq << ", pUsed[]=" <<
-            //                        pUsed[nq] << endl;
-            if (!inGroup)  // this means this deleted question is in a single
-                           // question group.
-            {
+
+            // this means this deleted question is in a single question group.
+            if (!inGroup) {
               exam[secNum]->PopBack();
               delete gp;
-              // cout << "Hey I am here! \n";
             }
           }
-
           nq++;
-          // cout << "################: " << gp->GetNoQ() << "\n\n\n";
         } else {
           wq += s1;
-          // cout << "What's going on?" << wq << endl;
         }
       }
 
-      if (StringContains(s1, "<group>")) {
+      if (utils::StringContains(s1, "<group>")) {
         if (inGroup) {
           cout << "ERROR: This lame program does not support nested group "
                   "structure. \n\n BYE BYE!! \n\n";
@@ -659,14 +630,14 @@ int main(int argc, char *argv[]) {
         gp = new Group();
         exam[secNum]->AddGroup(gp);
         // no suffle are in the same line as
-        if (StringContains(s1, "<noshuffle>")) {
+        if (utils::StringContains(s1, "<noshuffle>")) {
           gp->SetShuffle(false);
           if (verbose)
             cout << "Questions in this group will not be shuffled. \n";
         }
       }
       //
-      if (StringContains(s1, "<noshuffle>") && inGroup) {
+      if (utils::StringContains(s1, "<noshuffle>") && inGroup) {
         gp = exam[secNum]->GetLastGroup();
         // you can only place <no suffle> right after <group>
         if (gp->GetNoQ() == 0) {
@@ -676,7 +647,7 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      if (StringContains(s1, "</group>")) {
+      if (utils::StringContains(s1, "</group>")) {
         inGroup = false;
         gp = exam[secNum]->GetLastGroup();
         // no questions added in this group
@@ -689,9 +660,9 @@ int main(int argc, char *argv[]) {
       }
 
       // found the begining of a question
-      if (StringContains(s1, "<q>")) {
+      if (utils::StringContains(s1, "<q>")) {
         // found <noshuffle> tag
-        if (StringContains(s1, "<noshuffle>")) {
+        if (utils::StringContains(s1, "<noshuffle>")) {
           noShuffleChoice = true;
           if (verbose)
             cout << "<noshuffle> tag is found at line: " << l
@@ -701,7 +672,7 @@ int main(int argc, char *argv[]) {
         }
 
         wq = "";
-        if (!StringContains(s1, "</q>")) {
+        if (!utils::StringContains(s1, "</q>")) {
           wq += s1.substr(s1.find("<q>") + 3, s1.size());
           //    cout << "HAHA: "<< wq << endl;
           collecting = true;
@@ -735,7 +706,7 @@ int main(int argc, char *argv[]) {
             Question *q = new Question();
 
             //--------------------------------------------------------
-            if (StringContains(s1, "</layout=")) {
+            if (utils::StringContains(s1, "</layout=")) {
               string ttt = s1.substr(s1.find("</layout=") + 9, 1);
               q->SetLayout(atoi(ttt.c_str()));
               // cout << ttt << "\n\n";
@@ -744,7 +715,7 @@ int main(int argc, char *argv[]) {
             }
             //-------dfd--------------------------------------------
             q->AddWholeQuestion(wq);
-            if (StringContains(s1, "<noshuffle>")) {
+            if (utils::StringContains(s1, "<noshuffle>")) {
               q->SetAbleShuffle(false);
               cout << "<noshuffle> found at line: " << l
                    << ". No shuffle of options in this question.\n\n";
@@ -774,7 +745,7 @@ int main(int argc, char *argv[]) {
         }
       }  // <q>
 
-      if (StringContains(s1, "</label")) {
+      if (utils::StringContains(s1, "</label")) {
         if (!collecting) {
           cout << "ERROR: Orphan </label=question label> command found in the "
                   "line:"
@@ -787,7 +758,7 @@ int main(int argc, char *argv[]) {
 
         string ttt = s1.substr(s1.find("</label") + 7,
                                s1.length() - s1.find("</label") - 7);
-        TrimSpaces(ttt);
+        utils::TrimSpaces(ttt);
         // get rid of = and >
         ttt = ttt.substr(1, ttt.length() - 2);
         questionLabel = ttt;
@@ -797,7 +768,7 @@ int main(int argc, char *argv[]) {
         if (verbose)
           cout << "\tQuestion label: \"" << ttt << "\" found. " << endl;
       }
-      if (StringContains(s1, "</layout=")) {
+      if (utils::StringContains(s1, "</layout=")) {
         if (!collecting) {
           cout << "ERROR: Orphan </layout=n> command found in the line #" << l
                << "of repository file: " << filenames[i]
@@ -814,7 +785,7 @@ int main(int argc, char *argv[]) {
         // cout << ttt << "\n\n";
         if (verbose) cout << "User defined style " << ttt << " found. " << endl;
       }
-      if (StringContains(s1, "<img>")) {
+      if (utils::StringContains(s1, "<img>")) {
         // remove this segment of string
         string temp1 = s1.substr(s1.find("<img>"),
                                  s1.find("</img>") - s1.find("<img>") + 6);
@@ -829,7 +800,7 @@ int main(int argc, char *argv[]) {
         if (verbose) cout << "<img> marker found. You insert an image here. \n";
         gp->SetFigure(temp1, 1);
       }
-      if (StringContains(s1, "<txt>")) {
+      if (utils::StringContains(s1, "<txt>")) {
         // remove this segment of string
         string temp1 = s1.substr(s1.find("<txt>"),
                                  s1.find("</txt>") - s1.find("<txt>") + 6);
@@ -922,9 +893,9 @@ int main(int argc, char *argv[]) {
   for (unsigned int i = 0; i < exam.size(); i++) {
     solTemp = exam[i]->GetSolution();
     sol += solTemp;
-    solTemp = ConvertSol(solTemp);
+    solTemp = utils::ConvertSol(solTemp);
     //        cout << "solTemp: " << solTemp << endl;
-    if (StringContains(solTemp, "?"))
+    if (utils::StringContains(solTemp, "?"))
       cout << "\tThis question is in repository: \"" << filenames[i]
            << "\".\n\n\n";
   }
@@ -932,7 +903,7 @@ int main(int argc, char *argv[]) {
 
   //<< sol << endl;
   ofs << "Form 0" << endl;
-  ofs << ConvertSol(sol) << endl << endl;
+  ofs << utils::ConvertSol(sol) << endl << endl;
   ofs.close();
 
   // generating forms
@@ -995,21 +966,19 @@ int main(int argc, char *argv[]) {
     for (unsigned int i = 0; i < exam.size(); i++) {
       solTemp = exam[i]->GetSolution();
       sol += solTemp;
-      solTemp = ConvertSol(solTemp);
-      if (StringContains(solTemp, "?"))
+      solTemp = utils::ConvertSol(solTemp);
+      if (utils::StringContains(solTemp, "?"))
         cout << "\tThis question is in repository: " << filenames[i]
              << ".\n\n\n";
     }
     //
-    ofs << "Form " << char(65 + f) << endl << ConvertSol(sol) << endl << endl;
+    ofs << "Form " << char(65 + f) << endl << utils::ConvertSol(sol) << endl << endl;
     ofs.close();
   }
 
   // clear
-  //
-
-  for (unsigned int i = 0; i < exam.size(); i++) {
-    delete exam[i];
+  for (auto section : exam){
+    delete section;
   }
   exam.clear();
   utils::FreeVector(fUsed);
