@@ -22,27 +22,27 @@ public:
   Group();
   ~Group();
   void PushBack(Question *q);
-  void SetTAMode(bool t);
+  void SetTAMode(const bool t);
   void Shuffle();
 
-  Question *GetQuestion(size_t i);
-  Question *GetOrderedQuestion(size_t i);
+  Question *GetQuestion(const size_t i);
+  Question *GetOrderedQuestion(const size_t i);
 
   size_t GetNoQ() { return m_Questions.size(); }
-  void SetShuffle(bool t) { m_AbleShuffle = t; }
-  void SetDrawTopBar(bool l) { m_DrawTopBar = l; }
+  void SetShuffle(const bool t) { m_AbleShuffle = t; }
+  void SetDrawTopBar(const bool l) { m_DrawTopBar = l; }
   // must contain at least one question
   Question *GetLastQuestion() { return m_Questions[m_Questions.size() - 1]; }
   friend ostream &operator<<(ostream &out, const Group &g);
-  void SetFigure(string s, int b) {
-    if (b) {
+  void SetFigure(const string &s, const bool before_group) {
+    if (before_group) {
       m_FigBefore = s;
     } else {
       m_FigAfter = s;
     }
   }
-  void SetText(string s, int b) {
-    if (b) {
+  void SetText(const string &s, const bool before_group) {
+    if (before_group) {
       m_TextBefore = s;
     } else {
       m_TextAfter = s;

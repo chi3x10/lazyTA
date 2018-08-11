@@ -730,15 +730,12 @@ int main(int argc, char *argv[]) {
             q->SetQN(qAdded);
             qAdded++;
             gp->PushBack(q);
-          } else if (!inGroup)  // this means this deleted question is in a
-                                // single question group.
-          {
-            // cout << "There you are?\n\n";
+          } else if (!inGroup) {
+            // this means this deleted question is in a single question group.
             exam[secNum]->PopBack();
             if (verbose) {
               cout << "This question is not selected....\n";
             }
-
             delete gp;
           }
           nq++;
@@ -798,7 +795,7 @@ int main(int argc, char *argv[]) {
         temp1.replace(temp1.find("<img>"), 5, "");
         temp1.replace(temp1.find("</img>"), 6, "");
         if (verbose) cout << "<img> marker found. You insert an image here. \n";
-        gp->SetFigure(temp1, 1);
+        gp->SetFigure(temp1, true);
       }
       if (utils::StringContains(s1, "<txt>")) {
         // remove this segment of string
@@ -817,7 +814,7 @@ int main(int argc, char *argv[]) {
 
         if (verbose) cout << "<txt> marker found. You insert texts here. \n";
 
-        gp->SetText(temp1, 1);
+        gp->SetText(temp1, true);
         // cout << "TEXT set! " << endl;
       }
 
@@ -834,7 +831,7 @@ int main(int argc, char *argv[]) {
   string fofn = ofn + "_footprint.txt";
   ofs.open(fofn.c_str());
 
-  for (unsigned int i = 0; i < filenames.size(); i++) {
+  for (size_t i = 0; i < filenames.size(); i++) {
     ofs << filenames[i] << endl;
     pUsed = fUsed[i];
     for (size_t j = 0; j < nQS[i]; j++) {
@@ -956,14 +953,15 @@ int main(int argc, char *argv[]) {
 
     // Generate solution files.
     fofn = ofn + "_SOLUTION.txt";
-    if (f == 0)
+    if (f == 0) {
       ofs.open(fofn.c_str());
-    else
+    } else {
       ofs.open(fofn.c_str(), ios::out | ios::app);
-    // cout << "solution file opened!! " << endl;
+    }
+
     string sol = "";
     // get the solution
-    for (unsigned int i = 0; i < exam.size(); i++) {
+    for (size_t i = 0; i < exam.size(); i++) {
       solTemp = exam[i]->GetSolution();
       sol += solTemp;
       solTemp = utils::ConvertSol(solTemp);

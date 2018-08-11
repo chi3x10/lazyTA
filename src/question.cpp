@@ -15,8 +15,6 @@ int Question::GetSolution() {
 }
 
 void Question::AddWholeQuestion(string str) {
-  //
-  // cout << "Inside AddWholeQuestion : " << str <<endl;
   bool sol = false;
   // go to the boday of the question
   size_t bbeg = str.find("<b>") + 3, bend = str.find("</b>");
@@ -94,22 +92,22 @@ void Question::AddWholeQuestion(string str) {
   }
 }
 
-//-----------------------------------------------------------------------------
 void Question::Shuffle() {
   // int noc = (m_NOA)?m_NumOfChoices+1:m_NumOfChoices;
   if (m_AbleShuffle) {
     utils::ShuffleIndex(m_Orders, m_NumOfChoices);
   }
 }
-//-------------------------------------------------------------
-void Question::SetLabel(const string &s) { m_Label = s; }
-//-------------------------------------------------
+
+void Question::SetLabel(const string &s) {
+  m_Label = s;
+}
+
 ostream &operator<<(ostream &out, const Question &q) {
   // print label here
-  if (q.m_Label.length() > 0) out << "%% |  " << q.m_Label << endl;
-  //    out << "\\begin{minipage}{\\textwidth}\n\\item " << q.m_Question
-  //    <<"\\\\" << endl;
-  //
+  if (q.m_Label.length() > 0) {
+    out << "%% |  " << q.m_Label << endl;
+  }
 
   if (q.m_TAMode) {
     out << "\\begin{minipage}{\\linewidth}\n\\item \\fbox{Q. " << q.m_QN << "} "
@@ -119,35 +117,35 @@ ostream &operator<<(ostream &out, const Question &q) {
         << endl;
   }
 
-  size_t nc, nr, i;
+  size_t n_col, n_row;
   // print III
   if (q.m_NumOfIII > 0) {
     // how many columns does the table should have?
     if (q.m_TotalIW < 60) {
-      nc = 5;
+      n_col = 5;
       out << "    \\begin{tabular}{l l l l l}" << endl;
     } else if (q.m_MaxIW < 27) {
-      nc = 3;
+      n_col = 3;
       out << "    \\begin{tabular}{l l l}" << endl;
     } else if (q.m_MaxIW < 45) {
-      nc = 2;
+      n_col = 2;
       out << "    \\begin{tabular}{l l}" << endl;
     } else {
-      nc = 1;
+      n_col = 1;
       out << "    \\begin{tabular}{p{\\linewidth}}" << endl;
     }
 
     // number of rows of this table.
-    nr = static_cast<size_t>(ceil(q.m_NumOfIII / static_cast<double>(nc)));
+    n_row = static_cast<size_t>(ceil(q.m_NumOfIII / static_cast<double>(n_col)));
 
     // cout << "maxiw = " << m_MaxIW << endl;;
-    for (size_t j = 0; j < nr; j++) {
-      for (size_t c = 0; c < nc; c++) {
-        i = j * nc + c;
+    for (size_t j = 0; j < n_row; j++) {
+      for (size_t c = 0; c < n_col; c++) {
+        size_t i = j * n_col + c;
         if (i < q.m_NumOfIII)
           out << "        \\textbf{" << q.m_RN[i] << "} " << q.m_III[i];
         // cout << "c=" <<c<< ", i="<< i<<endl;
-        if (c == nc - 1)
+        if (c == n_col - 1)
           out << "\\\\" << endl;
         else
           out << "&" << endl;
@@ -159,34 +157,31 @@ ostream &operator<<(ostream &out, const Question &q) {
 
   // how many columns does the table should have?
   if (q.m_TotalCW < 60) {
-    nc = 5;
+    n_col = 5;
     out << "    \\begin{tabular}{l l l l l}" << endl;
   } else if (q.m_MaxCW < 27) {
-    nc = 3;
+    n_col = 3;
     out << "    \\begin{tabular}{l l l}" << endl;
   } else if (q.m_MaxCW < 39) {
-    nc = 2;
+    n_col = 2;
     out << "    \\begin{tabular}{l l}" << endl;
   } else {
-    nc = 1;
+    n_col = 1;
     out << "    \\begin{tabular}{p{\\linewidth}}" << endl;
   }
 
   size_t noc = (q.m_NOA) ? q.m_NumOfChoices + 1 : q.m_NumOfChoices;
-  nr = static_cast<size_t>(ceil(noc / static_cast<double>(nc)));
+  n_row = static_cast<size_t>(ceil(noc / static_cast<double>(n_col)));
 
   char a;
-  //  cout << "NOC = " << noc<< "nc=" << nc << ", nr=" << nr <<endl << endl;
   if (noc < q.m_MaxChoices) {
     cout << "ERROR! There are less than 5 choices for this question: \n"
          << q.m_Question << endl;
   }
-  // cout << "maxiw = " << m_MaxIW << endl;;
-  //
-  // cout << "nr = " << nr << ", nc= " << nc;
-  for (size_t j = 0; j < nr; j++) {
-    for (size_t c = 0; c < nc; c++) {
-      i = j * nc + c;
+
+  for (size_t j = 0; j < n_row; j++) {
+    for (size_t c = 0; c < n_col; c++) {
+      size_t i = j * n_col + c;
       a = static_cast<char>(65 + i);
 
       // cout << "i= " << i << ", ans = " << m_Choices[m_Orders[i]]<<endl;
@@ -217,7 +212,7 @@ ostream &operator<<(ostream &out, const Question &q) {
         }
       }
       // cout << "c=" <<c<< ", i="<< i<<endl;
-      if (c == nc - 1)
+      if (c == n_col - 1)
         out << "\\\\" << endl;
       else
         out << "&" << endl;
@@ -228,12 +223,12 @@ ostream &operator<<(ostream &out, const Question &q) {
   // table.
   // after using the minipage enviorement, the space between the end of table
   // and next question
-  // became just way too small. This only happens when nc != 5
-  //    if(nc==1)
+  // became just way too small. This only happens when n_col != 5
+  //    if(n_col==1)
   //        out << "  \\\\ \n";
-  //    else if(nc ==3)
+  //    else if(n_col ==3)
   //        out << "&   &   \\\\" << endl;
-  //    else if(nc == 2)
+  //    else if(n_col == 2)
   //        out << "&    \\\\" << endl;
 
   out << "    \\end{tabular} \n\\end{minipage}\n";
@@ -242,12 +237,12 @@ ostream &operator<<(ostream &out, const Question &q) {
 }
 
 //-------------------------------------------------
-bool Question::SetQuestion(string q) {
+bool Question::SetQuestion(const string &q) {
   m_Question = q;
   return true;
 }
 //-------------------------------------------------
-bool Question::AddIII(string iii) {
+bool Question::AddIII(const string &iii) {
   m_III[m_NumOfIII] = iii;
   m_NumOfIII++;
 
@@ -260,8 +255,8 @@ bool Question::AddIII(string iii) {
   return true;
 }
 //-------------------------------------------------
-bool Question::AddAChoice(string c, bool sol) {
-  if (c == "NOA") {
+bool Question::AddAChoice(const string &choice, const bool sol) {
+  if (choice == "NOA") {
     m_NOA = true;
 
     // None of the above is the correct one
@@ -276,12 +271,9 @@ bool Question::AddAChoice(string c, bool sol) {
     return true;
   }
 
-  m_Choices[m_NumOfChoices] = c;
+  m_Choices[m_NumOfChoices] = choice;
 
-  //   cout << "Answer: " << c << "  added to mCHoices[" << m_NumOfChoices <<
-  //   endl;
-
-  size_t l = c.length();
+  size_t l = choice.length();
   m_TotalCW += l;
 
   if (l > m_MaxCW) {
@@ -295,8 +287,11 @@ bool Question::AddAChoice(string c, bool sol) {
 
   return true;
 }
-//-------------------------------------------------
-void Question::SetLayout(int i) { m_LayoutStyle = i; }
+
+void Question::SetLayout(const int i) {
+  m_LayoutStyle = i;
+}
+
 Question::Question()
   : m_NumOfChoices(0)
   , m_SolIndex(-1)
