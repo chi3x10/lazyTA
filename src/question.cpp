@@ -1,14 +1,16 @@
 #include "question.h"
 
+#include <algorithm>
+
 namespace lazyta {
 
 using namespace std;
 using std::string;
 
 int Question::GetSolution() {
-  for (int i = 0; i < 10; i++) {
-    if (static_cast<int>(m_Orders[i]) == m_SolIndex) {
-      return i;
+  for (size_t i = 0; i < 10; i++) {
+    if (static_cast<int>(orders_[i]) == solution_index_) {
+      return static_cast<int>(i);
     }
   }
   return -1;
@@ -27,14 +29,14 @@ void Question::AddWholeQuestion(string str) {
     // remove leading and tailing spaces
     utils::TrimSpaces(s);
     // cout << s << "     ooh lala" << endl << endl;
-    SetQuestion(s);
+    set_question(s);
     // remove the body part
     str = str.substr(bend + 4, str.length());
   } else {
     string t = str.substr(bbeg, str.find("<ii>") - bbeg);
     // remove leading space
     utils::TrimSpaces(t);
-    SetQuestion(t);
+    set_question(t);
     // keep the </b> in the end. We uddse this to terminate when <ii>'s present
     bbeg = str.find("<ii>");
     bend = str.find("</b>");
@@ -49,7 +51,7 @@ void Question::AddWholeQuestion(string str) {
       t = s.substr(bbeg, bend - bbeg);
       // Trim
       utils::TrimSpaces(t);
-      AddIII(t);
+      AddOptionsInQBody(t);
       s = s.substr(bend + 5, s.length());
     }
   }
@@ -59,6 +61,7 @@ void Question::AddWholeQuestion(string str) {
     bend = str.find("</c>");
     s = str.substr(bbeg, bend - bbeg);
     utils::TrimSpaces(s);
+
     if (utils::StringContains(s, "<ANS>")) {
       sol = true;
       // remove <ANS> from the string
@@ -68,66 +71,71 @@ void Question::AddWholeQuestion(string str) {
     }
 
     // handle None of the above case
-    if (utils::StringContains(s, "<NOA>"))
+    if (utils::StringContains(s, "<NOA>")) {
       AddAChoice("NOA", sol);
-    else
+    } else {
       AddAChoice(s, sol);
+    }
     // remove the just added choice
     str = str.substr(bend + 4, str.length());
-    // cout << "Choice : "<< s << endl;
   }
 
   // user defined layout style
-  if (m_LayoutStyle == 1)
-    m_TotalCW = 0;
-  else if (m_LayoutStyle == 2) {
-    m_MaxCW = 20;
-    m_TotalCW = 90;
-  } else if (m_LayoutStyle == 3) {
-    m_MaxCW = 38;
-    m_TotalCW = 90;
-  } else if (m_LayoutStyle == 4) {
-    m_MaxCW = 100;
-    m_TotalCW = 90;
-  }
+  if (layout_style_ == Layout::FIVE_PER_ROW) {
+    max_width_choices_ = 20;
+    total_column_width_ = 90;
+  } else if (layout_style_ == Layout::THREE_PER_ROW) {
+    max_width_choices_ = 20;
+    total_column_width_ = 90;
+  } else if (layout_style_ == Layout::TWO_PER_ROW) {
+    max_width_choices_ = 38;
+    total_column_width_ = 90;
+  } else if (layout_style_ == Layout::ONE_PER_ROW) {
+    max_width_choices_ = 60;
+    total_column_width_ = 90;
+  } /*else {
+    max_width_choices_ = 100;
+    total_column_width_ = 90;
+  }*/
 }
 
 void Question::Shuffle() {
-  // int noc = (m_NOA)?m_NumOfChoices+1:m_NumOfChoices;
-  if (m_AbleShuffle) {
-    utils::ShuffleIndex(m_Orders, m_NumOfChoices);
+  // int noc = (is_none_of_above_)?choices_.size()+1:choices_.size();
+  if (enable_shuffle_) {
+    //utils::ShuffleIndexQ(orders_, choices_.size());
+    std::random_shuffle(orders_.begin(), orders_.end());
   }
 }
 
-void Question::SetLabel(const string &s) {
-  m_Label = s;
+void Question::set_label(const string &s) {
+  label_ = s;
 }
 
 ostream &operator<<(ostream &out, const Question &q) {
   // print label here
-  if (q.m_Label.length() > 0) {
-    out << "%% |  " << q.m_Label << endl;
+  if (q.label_.length() > 0) {
+    out << "%% |  " << q.label_ << endl;
   }
 
-  if (q.m_TAMode) {
-    out << "\\begin{minipage}{\\linewidth}\n\\item \\fbox{Q. " << q.m_QN << "} "
-        << q.m_Question << "\\\\" << endl;
+  if (q.TA_mode_) {
+    out << "\\begin{minipage}{\\linewidth}\n\\item \\fbox{Q. " << q.q_id_ << "} "
+        << q.question_ << "\\\\" << endl;
   } else {
-    out << "\\begin{minipage}{\\linewidth}\n\\item " << q.m_Question << "\\\\"
+    out << "\\begin{minipage}{\\linewidth}\n\\item " << q.question_ << "\\\\"
         << endl;
   }
 
   size_t n_col, n_row;
   // print III
-  if (q.m_NumOfIII > 0) {
+  if (q.options_in_q_body_.size() > 0) {
     // how many columns does the table should have?
-    if (q.m_TotalIW < 60) {
+    if (q.total_width_options_in_q_body_ < 60) {
       n_col = 5;
       out << "    \\begin{tabular}{l l l l l}" << endl;
-    } else if (q.m_MaxIW < 27) {
+    } else if (q.max_width_options_in_q_body_ < 27) {
       n_col = 3;
       out << "    \\begin{tabular}{l l l}" << endl;
-    } else if (q.m_MaxIW < 45) {
+    } else if (q.max_width_options_in_q_body_ < 45) {
       n_col = 2;
       out << "    \\begin{tabular}{l l}" << endl;
     } else {
@@ -136,19 +144,21 @@ ostream &operator<<(ostream &out, const Question &q) {
     }
 
     // number of rows of this table.
-    n_row = static_cast<size_t>(ceil(q.m_NumOfIII / static_cast<double>(n_col)));
+    n_row = static_cast<size_t>(ceil(q.options_in_q_body_.size() /
+                                     static_cast<double>(n_col)));
 
-    // cout << "maxiw = " << m_MaxIW << endl;;
     for (size_t j = 0; j < n_row; j++) {
       for (size_t c = 0; c < n_col; c++) {
         size_t i = j * n_col + c;
-        if (i < q.m_NumOfIII)
-          out << "        \\textbf{" << q.m_RN[i] << "} " << q.m_III[i];
-        // cout << "c=" <<c<< ", i="<< i<<endl;
-        if (c == n_col - 1)
+        if (i < q.options_in_q_body_.size()) {
+          out << "        \\textbf{" << q.roman_numbers_[i] << "} " << q.options_in_q_body_[i];
+        }
+
+        if (c == n_col - 1) {
           out << "\\\\" << endl;
-        else
+        } else {
           out << "&" << endl;
+        }
       }
     }
     out << "    \\end{tabular}\\\\\n";
@@ -156,13 +166,13 @@ ostream &operator<<(ostream &out, const Question &q) {
   }
 
   // how many columns does the table should have?
-  if (q.m_TotalCW < 60) {
+  if (q.total_column_width_ < 60) {
     n_col = 5;
     out << "    \\begin{tabular}{l l l l l}" << endl;
-  } else if (q.m_MaxCW < 27) {
+  } else if (q.max_width_choices_ < 27) {
     n_col = 3;
     out << "    \\begin{tabular}{l l l}" << endl;
-  } else if (q.m_MaxCW < 39) {
+  } else if (q.max_width_choices_ < 39) {
     n_col = 2;
     out << "    \\begin{tabular}{l l}" << endl;
   } else {
@@ -170,26 +180,26 @@ ostream &operator<<(ostream &out, const Question &q) {
     out << "    \\begin{tabular}{p{\\linewidth}}" << endl;
   }
 
-  size_t noc = (q.m_NOA) ? q.m_NumOfChoices + 1 : q.m_NumOfChoices;
+  size_t noc = (q.is_none_of_above_) ? q.choices_.size() + 1 : q.choices_.size();
   n_row = static_cast<size_t>(ceil(noc / static_cast<double>(n_col)));
 
   char a;
-  if (noc < q.m_MaxChoices) {
-    cout << "ERROR! There are less than 5 choices for this question: \n"
-         << q.m_Question << endl;
-  }
+//  if (noc < q.noa_position_) {
+//    cout << "ERROR! There are less than 5 choices for this question: \n"
+//         << q.question_ << endl;
+//  }
 
   for (size_t j = 0; j < n_row; j++) {
     for (size_t c = 0; c < n_col; c++) {
       size_t i = j * n_col + c;
       a = static_cast<char>(65 + i);
 
-      // cout << "i= " << i << ", ans = " << m_Choices[m_Orders[i]]<<endl;
+      // cout << "i= " << i << ", ans = " << choices_[orders_[i]]<<endl;
       if (i < noc) {
-        if (i == noc - 1 && q.m_NOA) {
+        if (i == noc - 1 && q.is_none_of_above_) {
           //                    cout << "HAHA: " << noc  << endl;
-          if (q.m_TAMode && q.m_SolIndex == static_cast<int>(q.m_Orders[i])) {
-            if (q.m_MaxCW > 80)
+          if (q.TA_mode_ && q.solution_index_ == static_cast<int>(q.orders_[i])) {
+            if (q.max_width_choices_ > 80)
               out << "        \\textsf{\\textbf{(" << a
                   << ")} $\\bigcirc$ None of the above. }";
             else
@@ -199,16 +209,16 @@ ostream &operator<<(ostream &out, const Question &q) {
             out << "        \\textsf{\\textbf{(" << a
                 << ")} None of the above. }";
         } else {
-          if (q.m_TAMode && q.m_SolIndex == static_cast<int>(q.m_Orders[i])) {
-            if (q.m_MaxCW > 80)
+          if (q.TA_mode_ && q.solution_index_ == static_cast<int>(q.orders_[i])) {
+            if (q.max_width_choices_ > 80)
               out << "        \\textsf{\\textbf{(" << a << ")} $\\bigcirc$"
-                  << q.m_Choices[q.m_Orders[i]] << "}";
+                  << q.choices_[q.orders_[i]] << "}";
             else
               out << "        \\textsf{\\textbf{(" << a << ")} \\fbox{"
-                  << q.m_Choices[q.m_Orders[i]] << "}}";
+                  << q.choices_[q.orders_[i]] << "}}";
           } else
             out << "        \\textsf{\\textbf{(" << a << ")} "
-                << q.m_Choices[q.m_Orders[i]] << "}";
+                << q.choices_[q.orders_[i]] << "}";
         }
       }
       // cout << "c=" <<c<< ", i="<< i<<endl;
@@ -237,95 +247,92 @@ ostream &operator<<(ostream &out, const Question &q) {
 }
 
 //-------------------------------------------------
-bool Question::SetQuestion(const string &q) {
-  m_Question = q;
+bool Question::set_question(const string &q) {
+  question_ = q;
   return true;
 }
 //-------------------------------------------------
-bool Question::AddIII(const string &iii) {
-  m_III[m_NumOfIII] = iii;
-  m_NumOfIII++;
+bool Question::AddOptionsInQBody(const string &iii) {
+  options_in_q_body_.push_back(iii);
 
-  m_TotalIW += iii.length();
+  total_width_options_in_q_body_ += iii.length();
 
-  if (iii.length() > m_MaxIW) {
-    m_MaxIW = iii.length();
+  if (iii.length() > max_width_options_in_q_body_) {
+    max_width_options_in_q_body_ = iii.length();
   }
 
   return true;
 }
 //-------------------------------------------------
-bool Question::AddAChoice(const string &choice, const bool sol) {
+bool Question::AddAChoice(const string &choice, const bool is_solution) {
   if (choice == "NOA") {
-    m_NOA = true;
+    is_none_of_above_ = true;
 
     // None of the above is the correct one
-    if (sol) {
-      m_SolIndex = static_cast<int>(m_MaxChoices - 1);
+    if (is_solution) {
+      solution_index_ = static_cast<int>(noa_position_ - 1);
     }
-    if (m_MaxCW < 16) {
-      m_MaxCW = 16;
+    if (max_width_choices_ < 16) {
+      max_width_choices_ = 16;
     }
 
-    m_TotalCW += 16;
+    total_column_width_ += 16;
     return true;
   }
 
-  m_Choices[m_NumOfChoices] = choice;
+  is_none_of_above_ = false;
+
+  // Push choice index.
+  orders_.push_back(choices_.size());
+
+  choices_.push_back(choice);
 
   size_t l = choice.length();
-  m_TotalCW += l;
+  total_column_width_ += l;
 
-  if (l > m_MaxCW) {
-    m_MaxCW = l;
+  if (l > max_width_choices_) {
+    max_width_choices_ = l;
   }
 
-  if (sol) {
-    m_SolIndex = static_cast<int>(m_NumOfChoices);
+  if (is_solution) {
+    solution_index_ = static_cast<int>(choices_.size() - 1);
   }
-  m_NumOfChoices++;
-
   return true;
 }
 
-void Question::SetLayout(const int i) {
-  m_LayoutStyle = i;
+void Question::set_layout_style(const Layout l) {
+  layout_style_ = l;
 }
 
 Question::Question()
-  : m_NumOfChoices(0)
-  , m_SolIndex(-1)
-  , m_NumOfIII(0)
-  , m_NOA(false)
-  , m_MaxChoices(5) {
+  : solution_index_(-1)
+  , is_none_of_above_(false)
+  , noa_position_(5) {
 
-  m_MaxCW = 0;
-  m_TotalCW = 0;
-  m_MaxIW = 0;
-  m_TotalIW = 0;
-  m_TAMode = false;
+  max_width_choices_ = 0;
+  total_column_width_ = 0;
+  max_width_options_in_q_body_ = 0;
+  total_width_options_in_q_body_ = 0;
+  TA_mode_ = false;
 
-  m_LayoutStyle = 0;
+  layout_style_ = Layout::NONE;
 
-  m_AbleShuffle = true;
+  enable_shuffle_ = true;
 
-  m_QN = 0;
+  q_id_ = 0;
 
-  m_RN[0] = "I.";
-  m_RN[1] = "II.";
-  m_RN[2] = "III.";
-  m_RN[3] = "IV.";
-  m_RN[4] = "V.";
-  m_RN[5] = "VI.";
-  m_RN[6] = "VII.";
-  m_RN[7] = "VIII.";
-  m_RN[8] = "IX.";
-  m_RN[9] = "X.";
-  m_Label = "";
+  roman_numbers_.push_back("I.");
+  roman_numbers_.push_back("II.");
+  roman_numbers_.push_back("III.");
+  roman_numbers_.push_back("IV.");
+  roman_numbers_.push_back("V.");
+  roman_numbers_.push_back("VI.");
+  roman_numbers_.push_back("VII.");
+  roman_numbers_.push_back("VIII.");
+  roman_numbers_.push_back("IX.");
+  roman_numbers_.push_back("X.");
 
-  for (size_t i = 0; i < 10; i++) {
-    m_Orders[i] = i;
-  }
+  label_ = "";
 }
 
 }  // namespace lazyta
