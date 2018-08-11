@@ -1,13 +1,16 @@
-#ifndef __INCLUDE_GROUP_H__
-#define __INCLUDE_GROUP_H__
+#pragma once
 
 #include "question.h"
+#include "utils.h"
+
 #include <cstdlib> // for srand and rand
 #include <math.h>
 #include <sstream>
 #include <string>
 #include <time.h>
 #include <vector>
+
+namespace lazyta {
 
 using std::string;
 using namespace std;
@@ -65,4 +68,4 @@ private:
   bool m_DrawTopBar;
 };
 
-#endif  // __INCLUDE_GROUP_H__
+}  // namespace lazyta

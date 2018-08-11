@@ -1,91 +1,16 @@
 #include "question.h"
 
+namespace lazyta {
+
 using namespace std;
 using std::string;
 
-string ConvertSol(string sol) {
-  // cout << "Answer key:" << endl;
-  // cout << sol << endl;
-
-  string solA = "";
-  char ai[2];
-  ai[1] = '\0';
-  char a;
-  for (unsigned int i = 0; i < sol.length(); i++) {
-    if (sol[i] == '-') {
-      solA += "?";
-      i++;
-      // cout << "ININ \n";
-    } else {
-      ai[0] = sol[i];
-      a = atoi(ai) + 65;
-      ai[0] = a;
-      solA += string(ai);
+int Question::GetSolution() {
+  for (int i = 0; i < 10; i++) {
+    if (static_cast<int>(m_Orders[i]) == m_SolIndex) {
+      return i;
     }
   }
-  // cout << "solA = " << solA << endl;
-  // cout << solA << endl;
-  string solB = "";
-  for (unsigned int i = 0; i < solA.length(); i += 5) {
-    solB += solA.substr(i, 5) + "\t";
-  }
-  return solB;
-}
-string Int2String(int v) {
-  std::stringstream out;
-  out << v;
-  return out.str();
-}
-
-bool Roll(int n, int m) {
-  int a = rand() % m + 1;
-  cout << "Time(NULL)= " << time(nullptr) << ", Dice rolled: " << a << " from "
-       << n << "/" << m << "\n\n";
-  return (a <= n);
-}
-bool IsNumber(const std::string &s) {
-  for (unsigned int i = 0; i < s.length(); i++) {
-    if (!std::isdigit(s[i])) return false;
-  }
-  return true;
-}
-
-bool StringContains(string s, string k) {
-  //    if(k=="<ii>")
-  //        cout << "\n\n\nI am checking III here \n\n\n" << s <<
-  //        (s.find(k)<s.size())  << endl << endl;;
-  return (s.find(k) < s.size());
-}
-void TrimSpaces(string &str) {
-  // Trim Both leading and trailing spaces
-  size_t startpos = str.find_first_not_of(" ");  // Find the first character
-                                                 // position after excluding
-                                                 // leading blank spaces
-  size_t endpos = str.find_last_not_of(
-      " ");  // Find the first character position from reverse af
-
-  // if all spaces or empty return an empty string
-  if ((string::npos == startpos) || (string::npos == endpos)) {
-    str = "";
-  } else
-    str = str.substr(startpos, endpos - startpos + 1);
-}
-
-void ShuffleIndex(size_t *index, size_t num) {
-  // put the in order first
-  for (size_t i = 0; i < num; i++) {
-    index[i] = i;
-  }
-  // randomly swap with another one;
-  for (size_t i = 0; i < num; i++) {
-    size_t j = static_cast<size_t>(rand()) % num;
-    std::swap(index[i], index[j]);
-  }
-}
-
-int Question::GetSolution() {
-  for (int i = 0; i < 10; i++)
-    if (m_Orders[i] == m_SolIndex) return i;
   return -1;
 }
 
@@ -94,15 +19,15 @@ void Question::AddWholeQuestion(string str) {
   // cout << "Inside AddWholeQuestion : " << str <<endl;
   bool sol = false;
   // go to the boday of the question
-  int bbeg = str.find("<b>") + 3, bend = str.find("</b>");
+  size_t bbeg = str.find("<b>") + 3, bend = str.find("</b>");
   string s;
 
   // normal question.
-  if (!StringContains(str, "<ii>")) {
+  if (!utils::StringContains(str, "<ii>")) {
     // remove the <b> </b>
     s = str.substr(bbeg, bend - bbeg);
     // remove leading and tailing spaces
-    TrimSpaces(s);
+    utils::TrimSpaces(s);
     // cout << s << "     ooh lala" << endl << endl;
     SetQuestion(s);
     // remove the body part
@@ -110,7 +35,7 @@ void Question::AddWholeQuestion(string str) {
   } else {
     string t = str.substr(bbeg, str.find("<ii>") - bbeg);
     // remove leading space
-    TrimSpaces(t);
+    utils::TrimSpaces(t);
     SetQuestion(t);
     // keep the </b> in the end. We uddse this to terminate when <ii>'s present
     bbeg = str.find("<ii>");
@@ -125,7 +50,7 @@ void Question::AddWholeQuestion(string str) {
       bend = s.find("</ii>");
       t = s.substr(bbeg, bend - bbeg);
       // Trim
-      TrimSpaces(t);
+      utils::TrimSpaces(t);
       AddIII(t);
       s = s.substr(bend + 5, s.length());
     }
@@ -135,16 +60,17 @@ void Question::AddWholeQuestion(string str) {
     bbeg = str.find("<c>") + 3;
     bend = str.find("</c>");
     s = str.substr(bbeg, bend - bbeg);
-    TrimSpaces(s);
-    if (StringContains(s, "<ANS>")) {
+    utils::TrimSpaces(s);
+    if (utils::StringContains(s, "<ANS>")) {
       sol = true;
       // remove <ANS> from the string
       s.replace(s.find("<ANS>"), 5, "");
-    } else
+    } else {
       sol = false;
+    }
 
     // handle None of the above case
-    if (StringContains(s, "<NOA>"))
+    if (utils::StringContains(s, "<NOA>"))
       AddAChoice("NOA", sol);
     else
       AddAChoice(s, sol);
@@ -172,7 +98,7 @@ void Question::AddWholeQuestion(string str) {
 void Question::Shuffle() {
   // int noc = (m_NOA)?m_NumOfChoices+1:m_NumOfChoices;
   if (m_AbleShuffle) {
-    ShuffleIndex(m_Orders, m_NumOfChoices);
+    utils::ShuffleIndex(m_Orders, m_NumOfChoices);
   }
 }
 //-------------------------------------------------------------
@@ -185,14 +111,15 @@ ostream &operator<<(ostream &out, const Question &q) {
   //    <<"\\\\" << endl;
   //
 
-  if (q.m_TAMode)
+  if (q.m_TAMode) {
     out << "\\begin{minipage}{\\linewidth}\n\\item \\fbox{Q. " << q.m_QN << "} "
         << q.m_Question << "\\\\" << endl;
-  else
+  } else {
     out << "\\begin{minipage}{\\linewidth}\n\\item " << q.m_Question << "\\\\"
         << endl;
+  }
 
-  int nc, nr, i;
+  size_t nc, nr, i;
   // print III
   if (q.m_NumOfIII > 0) {
     // how many columns does the table should have?
@@ -211,11 +138,11 @@ ostream &operator<<(ostream &out, const Question &q) {
     }
 
     // number of rows of this table.
-    nr = (int)ceil((double)q.m_NumOfIII / (double)nc);
+    nr = static_cast<size_t>(ceil(q.m_NumOfIII / static_cast<double>(nc)));
 
     // cout << "maxiw = " << m_MaxIW << endl;;
-    for (int j = 0; j < nr; j++) {
-      for (int c = 0; c < nc; c++) {
+    for (size_t j = 0; j < nr; j++) {
+      for (size_t c = 0; c < nc; c++) {
         i = j * nc + c;
         if (i < q.m_NumOfIII)
           out << "        \\textbf{" << q.m_RN[i] << "} " << q.m_III[i];
@@ -245,8 +172,8 @@ ostream &operator<<(ostream &out, const Question &q) {
     out << "    \\begin{tabular}{p{\\linewidth}}" << endl;
   }
 
-  int noc = (q.m_NOA) ? q.m_NumOfChoices + 1 : q.m_NumOfChoices;
-  nr = (int)ceil((double)noc / (double)nc);
+  size_t noc = (q.m_NOA) ? q.m_NumOfChoices + 1 : q.m_NumOfChoices;
+  nr = static_cast<size_t>(ceil(noc / static_cast<double>(nc)));
 
   char a;
   //  cout << "NOC = " << noc<< "nc=" << nc << ", nr=" << nr <<endl << endl;
@@ -257,16 +184,16 @@ ostream &operator<<(ostream &out, const Question &q) {
   // cout << "maxiw = " << m_MaxIW << endl;;
   //
   // cout << "nr = " << nr << ", nc= " << nc;
-  for (int j = 0; j < nr; j++) {
-    for (int c = 0; c < nc; c++) {
+  for (size_t j = 0; j < nr; j++) {
+    for (size_t c = 0; c < nc; c++) {
       i = j * nc + c;
-      a = (char)(65 + i);
+      a = static_cast<char>(65 + i);
 
       // cout << "i= " << i << ", ans = " << m_Choices[m_Orders[i]]<<endl;
       if (i < noc) {
         if (i == noc - 1 && q.m_NOA) {
           //                    cout << "HAHA: " << noc  << endl;
-          if (q.m_TAMode && q.m_SolIndex == q.m_Orders[i]) {
+          if (q.m_TAMode && q.m_SolIndex == static_cast<int>(q.m_Orders[i])) {
             if (q.m_MaxCW > 80)
               out << "        \\textsf{\\textbf{(" << a
                   << ")} $\\bigcirc$ None of the above. }";
@@ -277,7 +204,7 @@ ostream &operator<<(ostream &out, const Question &q) {
             out << "        \\textsf{\\textbf{(" << a
                 << ")} None of the above. }";
         } else {
-          if (q.m_TAMode && q.m_SolIndex == q.m_Orders[i]) {
+          if (q.m_TAMode && q.m_SolIndex == static_cast<int>(q.m_Orders[i])) {
             if (q.m_MaxCW > 80)
               out << "        \\textsf{\\textbf{(" << a << ")} $\\bigcirc$"
                   << q.m_Choices[q.m_Orders[i]] << "}";
@@ -339,9 +266,11 @@ bool Question::AddAChoice(string c, bool sol) {
 
     // None of the above is the correct one
     if (sol) {
-      m_SolIndex = m_MaxChoices - 1;
+      m_SolIndex = static_cast<int>(m_MaxChoices - 1);
     }
-    if (m_MaxCW < 16) m_MaxCW = 16;
+    if (m_MaxCW < 16) {
+      m_MaxCW = 16;
+    }
 
     m_TotalCW += 16;
     return true;
@@ -359,21 +288,22 @@ bool Question::AddAChoice(string c, bool sol) {
     m_MaxCW = l;
   }
 
-  if (sol) m_SolIndex = m_NumOfChoices;
+  if (sol) {
+    m_SolIndex = static_cast<int>(m_NumOfChoices);
+  }
   m_NumOfChoices++;
 
   return true;
 }
 //-------------------------------------------------
 void Question::SetLayout(int i) { m_LayoutStyle = i; }
-Question::Question() {
-  m_NumOfChoices = 0;
-  m_SolIndex = -1;
-  m_NumOfIII = 0;
+Question::Question()
+  : m_NumOfChoices(0)
+  , m_SolIndex(-1)
+  , m_NumOfIII(0)
+  , m_NOA(false)
+  , m_MaxChoices(5) {
 
-  //    m_QType = 1;
-  m_NOA = false;
-  m_MaxChoices = 5;
   m_MaxCW = 0;
   m_TotalCW = 0;
   m_MaxIW = 0;
@@ -398,7 +328,9 @@ Question::Question() {
   m_RN[9] = "X.";
   m_Label = "";
 
-  for (int i = 0; i < 10; i++) {
+  for (size_t i = 0; i < 10; i++) {
     m_Orders[i] = i;
   }
 }
+
+}  // namespace lazyta

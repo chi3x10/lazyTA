@@ -1,5 +1,7 @@
 #include "group.h"
 
+namespace lazyta {
+
 using namespace std;
 using std::string;
 
@@ -10,6 +12,7 @@ Group::~Group() { // cout << "Destructor visited! " << m_Questions.size() <<
   }
   m_Questions.clear();
 }
+
 Question *Group::GetQuestion(size_t i) {
   if (i >= m_Questions.size()) {
     return nullptr;
@@ -61,7 +64,7 @@ ostream &operator<<(ostream &out, const Group &g) {
 //-----------------------------------------------------------------------------
 void Group::Shuffle() {
   if (m_AbleShuffle) {
-    ShuffleIndex(m_Orders, m_Questions.size());
+    utils::ShuffleIndex(m_Orders, m_Questions.size());
   }
 }
 //-----------------------------------------------------------------------------
@@ -83,3 +86,5 @@ Group::Group() {
     m_Orders[i] = i;
   m_DrawTopBar = true;
 }
+
+}  // namespace lazyta
