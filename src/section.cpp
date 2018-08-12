@@ -15,7 +15,7 @@ string Section::GetSolution() {
         cout << "Warning:   The following question does not have a key "
                 "provided.\n\t---------------------------------------------"
                 "\n\t|   "
-             << gp->GetOrderedQuestion(j)->GetQuestionBody()
+             << gp->GetOrderedQuestion(j)->get_question()
              << "\n\t---------------------------------------------\n\tA '?' is "
                 "generated. \n";
       // cout <<"->" << sol<< endl;

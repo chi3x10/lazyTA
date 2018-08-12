@@ -29,7 +29,7 @@ public:
   Question *GetOrderedQuestion(const size_t i);
 
   size_t GetNoQ() { return m_Questions.size(); }
-  void SetShuffle(const bool t) { m_AbleShuffle = t; }
+  void SetShuffle(const bool t) { enable_shuffle_ = t; }
   void SetDrawTopBar(const bool l) { m_DrawTopBar = l; }
   // must contain at least one question
   Question *GetLastQuestion() { return m_Questions[m_Questions.size() - 1]; }
@@ -59,11 +59,11 @@ private:
   string m_TextAfter;
 
   // TA modes will generate
-  bool m_TAMode;
+  bool TA_mode_;
 
   // use to permute order of questions inside of this question group.
   size_t m_Orders[kMaxQuestions];
-  bool m_AbleShuffle;
+  bool enable_shuffle_;
   vector<Question *> m_Questions;
   bool m_DrawTopBar;
 };

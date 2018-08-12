@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
       // check if nQU number is provided
       if (utils::IsNumber(string(argv[i + 1]))) {
         i++;
-        nQU.push_back(atoi(argv[i]));
+        nQU.push_back(static_cast<size_t>(atoi(argv[i])));
         nQUProvided = true;
       }
     } else if (string(argv[i]) == "-o") {
@@ -573,33 +573,33 @@ int main(int argc, char *argv[]) {
           // replace _ with \_
           // user has specifized the layout style{
           if (userLayout > 0) {
-            q->SetLayout(userLayout);
+            q->set_layout_style(static_cast<Question::Layout>(userLayout));
             userLayout = -1;
           }
           if (questionLabel.length() > 0) {
-            q->SetLabel(questionLabel);
+            q->set_label(questionLabel);
             questionLabel = "";
           }
 
           q->AddWholeQuestion(wq);
           if (noShuffleChoice) {
-            q->SetAbleShuffle(false);
+            q->set_enable_shuffle(false);
             noShuffleChoice = false;
           }
 
           if (pUsed[nq] == 1) {
-            q->SetQN(qAdded);
+            q->set_q_id(qAdded);
             qAdded++;
             gp->PushBack(q);
             if (verbose) {
-              string ddd = q->GetQuestionBody();
+              string ddd = q->get_question();
               size_t n = (ddd.length() < 30) ? ddd.length() : 30;
               cout << "Question: \n\t" << ddd.substr(0, n)
                    << ".... is added. \n";
             }
           } else {
             if (verbose) {
-              string ddd = q->GetQuestionBody();
+              string ddd = q->get_question();
               size_t n = (ddd.length() < 30) ? ddd.length() : 30;
               cout << "Haha! XD   Question: \n\t" << ddd.substr(0, n)
                    << ".... is not selected. \n";
@@ -708,7 +708,7 @@ int main(int argc, char *argv[]) {
             //--------------------------------------------------------
             if (utils::StringContains(s1, "</layout=")) {
               string ttt = s1.substr(s1.find("</layout=") + 9, 1);
-              q->SetLayout(atoi(ttt.c_str()));
+              q->set_layout_style(static_cast<Question::Layout>(atoi(ttt.c_str())));
               // cout << ttt << "\n\n";
               if (verbose)
                 cout << "User defined style " << ttt << " found. " << endl;
@@ -716,18 +716,18 @@ int main(int argc, char *argv[]) {
             //-------dfd--------------------------------------------
             q->AddWholeQuestion(wq);
             if (utils::StringContains(s1, "<noshuffle>")) {
-              q->SetAbleShuffle(false);
+              q->set_enable_shuffle(false);
               cout << "<noshuffle> found at line: " << l
                    << ". No shuffle of options in this question.\n\n";
             }
 
             if (verbose) {
-              string ddd = q->GetQuestionBody();
+              string ddd = q->get_question();
               size_t n = (ddd.length() < 20) ? ddd.length() : 20;
               cout << "Question: \n\t" << ddd.substr(0, n)
                    << ".... is added. \n";
             }
-            q->SetQN(qAdded);
+            q->set_q_id(qAdded);
             qAdded++;
             gp->PushBack(q);
           } else if (!inGroup) {
@@ -767,7 +767,7 @@ int main(int argc, char *argv[]) {
       }
       if (utils::StringContains(s1, "</layout=")) {
         if (!collecting) {
-          cout << "ERROR: Orphan </layout=n> command found in the line #" << l
+          cout << "ERROR: Orphan </layout=n> commnd found in the line #" << l
                << "of repository file: " << filenames[i]
                << ". Please fix this problem immediately. \n";
           cout << "FYI: </layout=n> must be placed in between the <q> and the "
@@ -975,9 +975,9 @@ int main(int argc, char *argv[]) {
   }
 
   // clear
-  for (auto section : exam){
-    delete section;
-  }
+  //  for (auto section : exam){
+  //    delete section;
+  //  }
   exam.clear();
   utils::FreeVector(fUsed);
   utils::FreeVector(fKeep);

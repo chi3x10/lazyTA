@@ -35,7 +35,7 @@ consists of tags. The \<q\> and \<\/q\> tags define a question. Inside these two
 The above question code will generate LaTex codes that can be ”typeset-ed” into the following.
 Notice the order of the choices is shuffled.
 
-![Question](https://github.com/chi3x10/lazyTA/blob/feature/fistupload/img/q1.png)
+![Question](https://github.com/chi3x10/lazyTA/blob/master/img/q1.png)
 
 ### Qeustions Propertity Tags
 
@@ -57,7 +57,7 @@ program automatically determinate layout style of a question based on the length
 longest option(# of characters). This option allows users to set the layout of the question.
 Figure below demonstrates four different layout styles.
 
-![Question](https://github.com/chi3x10/lazyTA/blob/feature/fistupload/img/q2.png)
+![Question](https://github.com/chi3x10/lazyTA/blob/master/img/q2.png)
 
 
 **\<keepme\>** The question that contains this tag is guaranteed to be selected. It must be placed
@@ -76,7 +76,8 @@ The following is a more detailed example.
 ```
 
 The latex code generated from the above repo is
-![Question](https://github.com/chi3x10/lazyTA/blob/feature/fistupload/img/q3.png)
+![Question](https://github.com/chi3x10/lazyTA/blob/master/img/q3.png)
+
 
 ### Group
 Group tag (\<group\> and \<\/group\>) are used when multiple questions must be placed together.

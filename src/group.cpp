@@ -63,14 +63,14 @@ ostream &operator<<(ostream &out, const Group &g) {
 
 //-----------------------------------------------------------------------------
 void Group::Shuffle() {
-  if (m_AbleShuffle) {
+  if (enable_shuffle_) {
     utils::ShuffleIndex(m_Orders, m_Questions.size());
   }
 }
 //-----------------------------------------------------------------------------
 void Group::SetTAMode(const bool t) {
   for (unsigned int i = 0; i < m_Questions.size(); i++) {
-    m_Questions[i]->SetTAMode(t);
+    m_Questions[i]->set_TA_mode(t);
   }
 }
 //-----------------------------------------------------------------------------
@@ -81,9 +81,10 @@ Group::Group() {
   m_FigAfter = "";
   m_TextBefore = "";
   m_TextAfter = "";
-  m_AbleShuffle = true;
-  for (int i = 0; i < 100; i++)
+  enable_shuffle_ = true;
+  for (size_t i = 0; i < 100; i++) {
     m_Orders[i] = i;
+  }
   m_DrawTopBar = true;
 }
 
