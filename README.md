@@ -52,7 +52,7 @@ choice. This tag must be placed in between the \<c\> and \<\/c\> tags.
 **\<noshuffle\>** This tag disables the shuffling of choices of a question. It must be placed between the \<q\> and \<\/q\> tags and before the \<b\> tag of the question.
 
 
-**\<layout=n\>** Force the layout format. n is either 1,2,3, or 4. Without this property tag, the
+**\</layout=n\>** Force the layout format. n is either 1,2,3, or 4. Without this property tag, the
 program automatically determinate layout style of a question based on the length of the
 longest option(# of characters). This option allows users to set the layout of the question.
 Figure below demonstrates four different layout styles.
@@ -65,7 +65,7 @@ between the \<q\> and \<\/q\> tags and before the \<b\> tag of the question.
 The following is a more detailed example.
 
 ```
-<q><keepme><layout=4>
+<q><keepme></layout=4>
 <b>Which state is nicknamed sunshine state?</b>
 <c> New York.</c>
 <c> Florida.<ANS></c>
@@ -87,7 +87,7 @@ group. Below is an example of using group tags.
 ```
 <group><noshuffle>
 
-<q><keepme><layout=4>
+<q><keepme></layout=4>
 <b>Which state is nicknamed the sunshine state?</b>
 <c> New York.</c>
 <c> Florida.<ANS></c>
