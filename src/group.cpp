@@ -1,91 +1,95 @@
 #include "group.h"
 
+#include <algorithm>
+
 namespace lazyta {
 
 using namespace std;
 using std::string;
 
-Group::~Group() { // cout << "Destructor visited! " << m_Questions.size() <<
-                  // endl << endl;
-  for (unsigned int i = 0; i < m_Questions.size(); i++) {
-    delete m_Questions[i];
+Group::Group()
+  : fig_before_("")
+  , fig_after_("")
+  , text_before_("")
+  , text_after_("")
+  , enable_shuffle_(true)
+  , draw_top_bar_(true) {
+}
+
+Group::~Group() {
+  for (auto q : question_ptrs_) {
+    delete q;
   }
-  m_Questions.clear();
+  question_ptrs_.clear();
 }
 
 Question *Group::GetQuestion(const size_t i) {
-  if (i >= m_Questions.size()) {
+  if (i >= question_ptrs_.size()) {
     return nullptr;
   }
-  return m_Questions[i];
+  return question_ptrs_[i];
 }
 
 Question *Group::GetOrderedQuestion(const size_t i) {
-  if (i >= m_Questions.size()) {
+  if (i >= question_ptrs_.size()) {
     return nullptr;
   }
-  return m_Questions[m_Orders[i]];
+  return question_ptrs_[orders_[i]];
 }
 
 ostream &operator<<(ostream &out, const Group &g) {
-  //    cout << "The begining of group operator << "<< endl;
 
   // horizontal bar
-  if (g.m_Questions.size() > 1 && g.m_DrawTopBar)
+  if (g.question_ptrs_.size() > 1 && g.draw_top_bar_)
     out << "\n%%========================================================"
            "\n\\hspace{-1in} \\rule{8in}{1pt}\n";
 
-  if (g.m_TextBefore != "")
+  if (g.text_before_ != "")
     out << "%%Texts here are inserted before this group!! \n\n"
-        << g.m_TextBefore << endl;
-  if (g.m_FigBefore != "")
+        << g.text_before_ << endl;
+  if (g.fig_before_ != "")
     out << "%% A Figure here is inserted before this group!! \n"
-        << g.m_FigBefore << endl;
+        << g.fig_before_ << endl;
 
-  // print question
-  for (unsigned int i = 0; i < g.m_Questions.size(); i++) {
+  for (auto const ith : g.orders_) {
     out << "%% ----------------------------------------------------" << endl;
-    out << *(g.m_Questions[g.m_Orders[i]]);
+    out << *(g.question_ptrs_[ith]);
   }
-  if (g.m_FigAfter != "")
+
+  if (g.fig_after_ != "")
     out << "%% A Figure here is inserted AFTER this group!! \n"
-        << g.m_FigAfter << endl;
-  if (g.m_TextAfter != "")
+        << g.fig_after_ << endl;
+  if (g.text_after_ != "")
     out << "%%Texts here are inserted AFTER this group!! \n\n"
-        << g.m_TextAfter << endl;
+        << g.text_after_ << endl;
   // bottom horizontal bar
-  if (g.m_Questions.size() > 1)
+  if (g.question_ptrs_.size() > 1)
     out << "\n\\hspace{-1in} "
            "\\rule{8in}{1pt}\n%%==============================================="
            "============\n";
   return out;
 }
 
-//-----------------------------------------------------------------------------
 void Group::Shuffle() {
-  if (enable_shuffle_) {
-    utils::ShuffleIndex(m_Orders, m_Questions.size());
+  if (!enable_shuffle_) {
+    return;
   }
+  orders_.clear();
+  for(size_t i = 0; i < question_ptrs_.size(); ++i){
+    orders_.push_back(i);
+  }
+  std::random_shuffle(orders_.begin(), orders_.end());
 }
-//-----------------------------------------------------------------------------
+
 void Group::SetTAMode(const bool t) {
-  for (unsigned int i = 0; i < m_Questions.size(); i++) {
-    m_Questions[i]->set_TA_mode(t);
+  for (auto const q : question_ptrs_) {
+    q->set_TA_mode(t);
   }
 }
-//-----------------------------------------------------------------------------
-void Group::PushBack(Question *q) { m_Questions.push_back(q); }
-//-----------------------------------------------------------------------------
-Group::Group() {
-  m_FigBefore = "";
-  m_FigAfter = "";
-  m_TextBefore = "";
-  m_TextAfter = "";
-  enable_shuffle_ = true;
-  for (size_t i = 0; i < 100; i++) {
-    m_Orders[i] = i;
-  }
-  m_DrawTopBar = true;
+
+void Group::PushBack(Question *q) {
+  orders_.push_back(question_ptrs_.size());
+  question_ptrs_.push_back(q);
 }
 
 }  // namespace lazyta

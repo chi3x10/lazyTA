@@ -37,7 +37,6 @@ class Question {
 
   void AddWholeQuestion(string str);
 
-  void set_noa_position(const size_t m) { noa_position_ = m; }
   void set_TA_mode(const bool l) { TA_mode_ = l; }
   string get_question() { return question_; }
   std::vector<std::string> get_options_in_q_body() {
@@ -97,11 +96,10 @@ class Question {
   size_t total_width_options_in_q_body_;
 
   // contains None of the Above choice
-  bool is_none_of_above_;
+  bool has_none_of_above_;
+  // None of the above is the correct answer.
+  bool noa_is_ans_;
 
-  // Where to put the None of the above choice. Currently it's hardcoded to 5. TODO():
-  // Need to figure out a way to always to None of the above in the last choice.
-  size_t noa_position_;
   // Roman numbers
   //std::vector<string> roman_numbers_;
   std::vector<string> roman_numbers_;

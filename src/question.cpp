@@ -8,7 +8,12 @@ using namespace std;
 using std::string;
 
 int Question::GetSolution() {
-  for (size_t i = 0; i < 10; i++) {
+  if (has_none_of_above_ && noa_is_ans_) {
+    // Note: choices_ does not contain the actual "None of the above" so
+    // it's size is 1 smaller. That's why we are return the size here.
+    return static_cast<int>(choices_.size());
+  }
+  for (size_t i = 0; i < choices_.size(); i++) {
     if (static_cast<int>(orders_[i]) == solution_index_) {
       return static_cast<int>(i);
     }
@@ -93,16 +98,11 @@ void Question::AddWholeQuestion(string str) {
   } else if (layout_style_ == Layout::ONE_PER_ROW) {
     max_width_choices_ = 60;
     total_column_width_ = 90;
-  } /*else {
-    max_width_choices_ = 100;
-    total_column_width_ = 90;
-  }*/
+  }
 }
 
 void Question::Shuffle() {
-  // int noc = (is_none_of_above_)?choices_.size()+1:choices_.size();
   if (enable_shuffle_) {
-    //utils::ShuffleIndexQ(orders_, choices_.size());
     std::random_shuffle(orders_.begin(), orders_.end());
   }
 }
@@ -162,7 +162,6 @@ ostream &operator<<(ostream &out, const Question &q) {
       }
     }
     out << "    \\end{tabular}\\\\\n";
-    //        out << "    \\end{tabular}\\\n";
   }
 
   // how many columns does the table should have?
@@ -180,66 +179,51 @@ ostream &operator<<(ostream &out, const Question &q) {
     out << "    \\begin{tabular}{p{\\linewidth}}" << endl;
   }
 
-  size_t noc = (q.is_none_of_above_) ? q.choices_.size() + 1 : q.choices_.size();
+  size_t noc = (q.has_none_of_above_) ? q.choices_.size() + 1 : q.choices_.size();
   n_row = static_cast<size_t>(ceil(noc / static_cast<double>(n_col)));
-
-  char a;
-//  if (noc < q.noa_position_) {
-//    cout << "ERROR! There are less than 5 choices for this question: \n"
-//         << q.question_ << endl;
-//  }
 
   for (size_t j = 0; j < n_row; j++) {
     for (size_t c = 0; c < n_col; c++) {
       size_t i = j * n_col + c;
-      a = static_cast<char>(65 + i);
+      char item_i = static_cast<char>(65 + i);
 
       // cout << "i= " << i << ", ans = " << choices_[orders_[i]]<<endl;
       if (i < noc) {
-        if (i == noc - 1 && q.is_none_of_above_) {
-          //                    cout << "HAHA: " << noc  << endl;
-          if (q.TA_mode_ && q.solution_index_ == static_cast<int>(q.orders_[i])) {
-            if (q.max_width_choices_ > 80)
-              out << "        \\textsf{\\textbf{(" << a
+        // If this question contains None of the Above and we are at the last choice.
+        if (i == noc - 1 && q.has_none_of_above_) {
+          if (q.TA_mode_ && q.noa_is_ans_) {
+            if (q.max_width_choices_ > 80) {
+              out << "        \\textsf{\\textbf{(" << item_i
                   << ")} $\\bigcirc$ None of the above. }";
-            else
-              out << "        \\textsf{\\textbf{(" << a
+            } else {
+              out << "        \\textsf{\\textbf{(" << item_i
                   << ")} \\fbox{ None of the above.} }";
-          } else
-            out << "        \\textsf{\\textbf{(" << a
+            }
+          } else {
+            out << "        \\textsf{\\textbf{(" << item_i
                 << ")} None of the above. }";
+          }
         } else {
           if (q.TA_mode_ && q.solution_index_ == static_cast<int>(q.orders_[i])) {
             if (q.max_width_choices_ > 80)
-              out << "        \\textsf{\\textbf{(" << a << ")} $\\bigcirc$"
+              out << "        \\textsf{\\textbf{(" << item_i << ")} $\\bigcirc$"
                   << q.choices_[q.orders_[i]] << "}";
             else
-              out << "        \\textsf{\\textbf{(" << a << ")} \\fbox{"
+              out << "        \\textsf{\\textbf{(" << item_i << ")} \\fbox{"
                   << q.choices_[q.orders_[i]] << "}}";
           } else
-            out << "        \\textsf{\\textbf{(" << a << ")} "
+            out << "        \\textsf{\\textbf{(" << item_i<< ")} "
                 << q.choices_[q.orders_[i]] << "}";
         }
       }
       // cout << "c=" <<c<< ", i="<< i<<endl;
-      if (c == n_col - 1)
+      if (c == n_col - 1) {
         out << "\\\\" << endl;
-      else
+      } else {
         out << "&" << endl;
+      }
     }
   }
-
-  // when number of columns is not equal 5, put an extra row in the end of the
-  // table.
-  // after using the minipage enviorement, the space between the end of table
-  // and next question
-  // became just way too small. This only happens when n_col != 5
-  //    if(n_col==1)
-  //        out << "  \\\\ \n";
-  //    else if(n_col ==3)
-  //        out << "&   &   \\\\" << endl;
-  //    else if(n_col == 2)
-  //        out << "&    \\\\" << endl;
 
   out << "    \\end{tabular} \n\\end{minipage}\n";
   out << "\\vskip 0.3cm\n";
@@ -266,11 +250,16 @@ bool Question::AddOptionsInQBody(const string &iii) {
 //-------------------------------------------------
 bool Question::AddAChoice(const string &choice, const bool is_solution) {
   if (choice == "NOA") {
-    is_none_of_above_ = true;
+    has_none_of_above_ = true;
 
     // None of the above is the correct one
     if (is_solution) {
-      solution_index_ = static_cast<int>(noa_position_ - 1);
+      // solution_index_ doesn't matter when the correct ans is NOA because
+      // in GetSolution we will simply return choices_.size() -1
+      solution_index_ = -1;
+      noa_is_ans_ = true;
+    } else {
+      noa_is_ans_ = false;
     }
     if (max_width_choices_ < 16) {
       max_width_choices_ = 16;
@@ -279,8 +268,6 @@ bool Question::AddAChoice(const string &choice, const bool is_solution) {
     total_column_width_ += 16;
     return true;
   }
-
-  is_none_of_above_ = false;
 
   // Push choice index.
   orders_.push_back(choices_.size());
@@ -305,21 +292,18 @@ void Question::set_layout_style(const Layout l) {
 }
 
 Question::Question()
-  : solution_index_(-1)
-  , is_none_of_above_(false)
-  , noa_position_(5) {
-
-  max_width_choices_ = 0;
-  total_column_width_ = 0;
-  max_width_options_in_q_body_ = 0;
-  total_width_options_in_q_body_ = 0;
-  TA_mode_ = false;
-
-  layout_style_ = Layout::NONE;
-
-  enable_shuffle_ = true;
-
-  q_id_ = 0;
+  : enable_shuffle_(true)
+  , max_width_options_in_q_body_(0)
+  , solution_index_(-1)
+  , label_("")
+  , max_width_choices_(0)
+  , total_column_width_(0)
+  , total_width_options_in_q_body_(0)
+  , has_none_of_above_(false)
+  , noa_is_ans_(false)
+  , TA_mode_(false)
+  , layout_style_(Layout::NONE)
+  , q_id_(0) {
 
   roman_numbers_.push_back("I.");
   roman_numbers_.push_back("II.");
@@ -331,8 +315,6 @@ Question::Question()
   roman_numbers_.push_back("VIII.");
   roman_numbers_.push_back("IX.");
   roman_numbers_.push_back("X.");
-
-  label_ = "";
 }
 
 }  // namespace lazyta

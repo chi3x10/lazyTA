@@ -28,44 +28,49 @@ public:
   Question *GetQuestion(const size_t i);
   Question *GetOrderedQuestion(const size_t i);
 
-  size_t GetNoQ() { return m_Questions.size(); }
+  size_t GetNoQ() { return question_ptrs_.size(); }
   void SetShuffle(const bool t) { enable_shuffle_ = t; }
-  void SetDrawTopBar(const bool l) { m_DrawTopBar = l; }
-  // must contain at least one question
-  Question *GetLastQuestion() { return m_Questions[m_Questions.size() - 1]; }
+  void SetDrawTopBar(const bool l) { draw_top_bar_ = l; }
+
+  Question *GetLastQuestion() {
+    if (question_ptrs_.size() == 0) {
+      return nullptr;
+    }
+    return *question_ptrs_.end();
+  }
+
   friend ostream &operator<<(ostream &out, const Group &g);
+
   void SetFigure(const string &s, const bool before_group) {
     if (before_group) {
-      m_FigBefore = s;
+      fig_before_ = s;
     } else {
-      m_FigAfter = s;
+      fig_after_ = s;
     }
   }
   void SetText(const string &s, const bool before_group) {
     if (before_group) {
-      m_TextBefore = s;
+      text_before_ = s;
     } else {
-      m_TextAfter = s;
+      text_after_ = s;
     }
   }
 private:
-  static constexpr size_t kMaxQuestions = 200;
+  static constexpr size_t kMaxQuestionsPerGroup = 200;
 
   // The figure or extra latex codes inserted before/after this question group
-  string m_FigBefore;
-  string m_FigAfter;
+  string fig_before_;
+  string fig_after_;
   // Texts inserted before/after this question group
-  string m_TextBefore;
-  string m_TextAfter;
-
-  // TA modes will generate
-  bool TA_mode_;
+  string text_before_;
+  string text_after_;
 
   // use to permute order of questions inside of this question group.
-  size_t m_Orders[kMaxQuestions];
+  std::vector<size_t> orders_;
+
   bool enable_shuffle_;
-  vector<Question *> m_Questions;
-  bool m_DrawTopBar;
+  std::vector<Question *> question_ptrs_;
+  bool draw_top_bar_;
 };
 
 }  // namespace lazyta
