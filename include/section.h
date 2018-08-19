@@ -12,31 +12,38 @@ namespace lazyta {
 
 class Section {
  public:
-  Section();
+  Section() { }
   // bool Load(string fn);
   void Shuffle();
-  void AddGroup(Group* g) { m_Groups.push_back(g); }
-  void PopBack() {  // cout << "Before: " << m_Groups.size() << endl;
-    m_Groups.pop_back();
+  void AddGroup(Group* g) {
+    orders_.push_back(group_ptrs_.size());
+    group_ptrs_.push_back(g);
+  }
+  void PopBack() {  // cout << "Before: " << group_ptrs_.size() << endl;
+    group_ptrs_.pop_back();
   }
   string GetSolution();
-  Group* GetLastGroup() { return m_Groups[m_Groups.size() - 1]; }
+  Group* GetLastGroup() { return group_ptrs_[group_ptrs_.size() - 1]; }
   ~Section();
   friend ostream& operator<<(ostream& out, const Section& s);
   void SetTAMode(bool t);
+
   // get the number of groups
-  size_t GetNoG() { return m_Groups.size(); }
+  size_t GetNoG() { return group_ptrs_.size(); }
+
   // Get i-th group
   Group* GetGroup(size_t i) {
-    if (i >= m_Groups.size()) return nullptr;
-    return m_Groups[i];
+    if (i >= group_ptrs_.size()) {
+      return nullptr;
+    }
+    return group_ptrs_[i];
   }
 
  private:
   static constexpr size_t kMaxNumSections = 100;
   // ifstream ifs;
-  std::vector<Group*> m_Groups;
-  size_t m_Orders[kMaxNumSections];
+  std::vector<Group*> group_ptrs_;
+  std::vector<size_t> orders_;
 };
 
 }  // namespace lazyta

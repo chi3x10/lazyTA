@@ -1,5 +1,7 @@
 #include "section.h"
 
+#include <algorithm>
+
 namespace lazyta {
 using namespace std;
 using std::string;
@@ -7,8 +9,8 @@ using std::string;
 string Section::GetSolution() {
   Group *gp;
   string sol = "";
-  for (unsigned int i = 0; i < m_Groups.size(); i++) {
-    gp = m_Groups[m_Orders[i]];
+  for (unsigned int i = 0; i < group_ptrs_.size(); i++) {
+    gp = group_ptrs_[orders_[i]];
     for (size_t j = 0; j < gp->GetNoQ(); j++) {
       sol += string(utils::Int2String((gp->GetOrderedQuestion(j))->GetSolution()));
       if ((gp->GetOrderedQuestion(j))->GetSolution() == -1)
@@ -23,11 +25,13 @@ string Section::GetSolution() {
   }
   return sol;
 }
-//----------------------------------------------------------------------------
+
 void Section::SetTAMode(bool t) {
-  for (unsigned int i = 0; i < m_Groups.size(); i++) m_Groups[i]->SetTAMode(t);
+  for(auto const g_ptr : group_ptrs_) {
+    g_ptr->SetTAMode(t);
+  }
 }
-//----------------------------------------------------------------------------
+
 ostream &operator<<(ostream &out, const Section &s) {
   Group *g;
   out << "%%Warning!!: There should not be any text between the "
@@ -37,8 +41,8 @@ ostream &operator<<(ostream &out, const Section &s) {
 
   // previous group is a multiple questions group
   bool preMG = false;
-  for (unsigned int i = 0; i < s.m_Groups.size(); i++) {
-    g = s.m_Groups[s.m_Orders[i]];
+  for (unsigned int i = 0; i < s.group_ptrs_.size(); i++) {
+    g = s.group_ptrs_[s.orders_[i]];
     if (preMG && g->GetNoQ() > 1)  // previous group and this group both have
                                    // more than one question
       g->SetDrawTopBar(false);
@@ -49,16 +53,17 @@ ostream &operator<<(ostream &out, const Section &s) {
   }
   return out;
 }
-//----------------------------------------------------------------------------
+
 void Section::Shuffle() {
   // shuffle groups
-  utils::ShuffleIndex(m_Orders, m_Groups.size());
+  std::random_shuffle(orders_.begin(), orders_.end());
+
   // shuffle questions in each group if the group contains more than one
   // question
   Group *group;
   Question *ques;
-  for (size_t i = 0; i < m_Groups.size(); i++) {
-    group = m_Groups[i];
+  for (size_t i = 0; i < group_ptrs_.size(); i++) {
+    group = group_ptrs_[i];
     group->Shuffle();
     for (size_t j = 0; j < group->GetNoQ(); j++) {
       // shffle choices.
@@ -67,24 +72,12 @@ void Section::Shuffle() {
     }
   }
 }
-//----------------------------------------------------------------------------
-/*bool Section::Load(string fn)
-{
-    //ifs.open(fn.c_str());
-    return true;
-}*/
-//-----------------------------------------------------------------------------
-Section::Section() {
-  for (size_t i = 0; i < 100; i++) {
-    m_Orders[i] = i;
-  }
-}
+
 Section::~Section() {
-  Group *gp;
-  for (unsigned int i = 0; i < m_Groups.size(); i++) {
-    gp = m_Groups[i];
+  for (auto gp : group_ptrs_) {
     delete gp;
   }
-  m_Groups.clear();
+  group_ptrs_.clear();
 }
+
 }  // namespace lazyta
