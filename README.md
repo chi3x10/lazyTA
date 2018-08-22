@@ -12,12 +12,12 @@
  - allows users to specify questions to be included.
 
 ## Repo files. 
-A repo file is a text file that contains a collection of multiple choice questions. It must be in the format lazyTA can recognize. Don't worry, it is very similar to HTML. Here are some examples. 
+A repo file is a text file that contains a collection of multiple choice questions. The format of repo files is very similar to HTML. You can find examples in the `./repo/` folder.  
 
 ### A simple example
   Just like html files, the basic structure of a repo file
 consists of tags. The \<q\> and \<\/q\> tags define a question. Inside these two tags, the \<b\> and
-\<\/b\> tags define the body of the question. Each option of the question is enclosed by \<c\> and
+\<\/b\> tags define the body of the question. Each option/choice of the question is enclosed by \<c\> and
 \<\/c\> tags. The \<b\> and \<\/b\> tags must always be placed before the \<c\> and \<\/c\> tags.
 
 ```
@@ -32,36 +32,34 @@ consists of tags. The \<q\> and \<\/q\> tags define a question. Inside these two
 </q>
 ```
 
-The above question code will generate LaTex codes that can be ”typeset-ed” into the following.
+The above question code will generate LaTex codes that can be typeseted into the following.
 Notice the order of the choices is shuffled.
 
 ![Question](https://github.com/chi3x10/lazyTA/blob/master/img/q1.png)
 
-### Qeustions Propertity Tags
+### Qeustions Property Tags
 
-**\<ANS\>** This property tag tells the program which choice is the correct one. This is primarily
-used to generate the answer key files. When a question doesn’t have an \<ANS\> tag, a
-question mark will be placed in the answer key file. Also, in the TA form, the correct answer
-will be marked with a box. This tag must be placed in between the \<c\> and \<\/c\> tags.
+**\<ANS\>** This property tag tells the program which choice is the correct answer. This is primarily
+used to generate the answer key files and the TA form in which the correct answer is highlighted in the pdf. When a question doesn’t have an \<ANS\> tag, a
+question mark will be placed in the answer key file. This tag must be placed in between the \<c\> and \<\/c\> tags.
 
-
-**\<NOA\>** This tag creates a option ”None of the above.”. This option will always be the last
-choice. This tag must be placed in between the \<c\> and \<\/c\> tags.
+**\<NOA\>** This tag creates a option ”None of the above.”. The reason we have this tag is to make sure the 
+"None of the above" choice is always placed last. This tag must be placed in between the \<c\> and \<\/c\> tags.
 
 
-**\<noshuffle\>** This tag disables the shuffling of choices of a question. It must be placed between the \<q\> and \<\/q\> tags and before the \<b\> tag of the question.
+**\<noshuffle\>** This tag disables the shuffling of choices of a question. It must be placed between the \<q\> and \<\/q\> tags **AND** before the \<b\> tag of the question.
 
 
 **\</layout=n\>** Force the layout format. n is either 1,2,3, or 4. Without this property tag, the
 program automatically determinate layout style of a question based on the length of the
-longest option(# of characters). This option allows users to set the layout of the question.
-Figure below demonstrates four different layout styles.
+longest option(# of characters). This option allows users to force the layout of the question.
+Figure below demonstrates the four different layout styles.
 
 ![Question](https://github.com/chi3x10/lazyTA/blob/master/img/q2.png)
 
 
-**\<keepme\>** The question that contains this tag is guaranteed to be selected. It must be placed
-between the \<q\> and \<\/q\> tags and before the \<b\> tag of the question.
+**\<keepme\>** The question that contains this tag is guaranteed to be selected during the random selection process. 
+It must be placed between the \<q\> and \<\/q\> tags and before the \<b\> tag of the question.
 The following is a more detailed example.
 
 ```
@@ -80,7 +78,7 @@ The latex code generated from the above repo is
 
 
 ### Group
-Group tag (\<group\> and \<\/group\>) are used when multiple questions must be placed together.
+Group tag (\<group\> and \<\/group\>) are used when multiple questions must be grouped together.
 Questions enlosed by \<group\> and \<\/group\> can still be shuffled but only shuffled within the
 group. Below is an example of using group tags.
 
@@ -201,7 +199,7 @@ on the total number of questions in each repo.
 ./lazyTA -i exam1_1.rep -o midterm
 ```
 ## Useful Scripts
-
+You can find the following scripts in the `./scripts/` folder. 
 - `pdf_all_tex_files.sh`: Compile all tex files in a folder to pdfs.
 - `bubble.m`: A matlab script to fill in the solution on a scantron form. Unless you are using the exact same scantron as we did, you will need to modify it. 
 
